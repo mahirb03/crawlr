@@ -74,7 +74,7 @@
     live: true, day: 0, t: 0,
     area: store.get("crawlr.area", "Bandra West"),
     f: store.get("crawlr.filter", "all"),
-    tab: "deals", moreOpen: 12,
+    tab: "deals", moreOpen: 12, favs: store.get("crawlr.favs", []), favDay: "week",
     crawl: store.get("crawlr.crawl", [])       // [{bar, outlet}]
   };
   const sync = () => { if (st.live) { const n = istNow(); st.day = n.day; st.t = n.t; } };
@@ -91,6 +91,7 @@
   const lateOutlet = (o) => (closesAt(o, st.day) || 0) >= LATE;
   const passes = (d, o) => st.f === "all" || (st.f === "late" ? (o ? lateOutlet(o) : false) || (d.tags || []).includes("late") : (d.tags || []).includes(st.f));
   const inCrawl = (id) => st.crawl.some((c) => c.bar === id);
+  const isFav = (id) => st.favs.includes(id);
 
   // ---- deals view ----
   function collect() {
@@ -175,6 +176,7 @@
   const addBtn = (b, oi) => inCrawl(b.id)
     ? `<button class="btn" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="true">${ico("check")}In crawl</button>`
     : `<button class="btn fill" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="false">${ico("plus")}Crawl</button>`;
+  const favBtn = (b) => `<button class="btn icon fav ${isFav(b.id) ? "on" : ""}" type="button" data-fav="${b.id}" aria-pressed="${isFav(b.id)}" aria-label="${isFav(b.id) ? "Remove from" : "Add to"} favourites">${ico("heart")}</button>`;
   const mapBtn = (b, o) => `<a class="btn icon" href="${mapsUrl(b, o)}" target="_blank" rel="noopener" title="Open in Maps" aria-label="Open ${esc(b.name)} in Maps">${ico("map")}</a>`;
   const srcFlag = (d) => `<span class="flag src" title="${d.conf === "recent" ? "Seen recently" : "Older report"}: ${esc(d.src)}${d.note ? ". " + esc(d.note) : ""}">${ico("info")}${d.conf === "recent" ? "Recent" : "Older"}</span>`;
   const warnFlag = (o) => o.status !== "open" ? `<span class="flag warn" title="Opening hours aren't listed on Google">${ico("warn")}Call first</span>` : "";
@@ -195,7 +197,7 @@
       <div class="deal">${esc(d.text)}</div>
       <div class="meta">${ico("clock")}${dealTime(d)}</div>
       <div class="bar" aria-hidden="true"><i style="left:${pct(s.s)};width:${pct(s.e - s.s)}"></i><b style="left:${pct(st.t)}"></b></div>
-      <div class="acts">${addBtn(b, oi)}${b.outlets.length > 1 ? "" : mapBtn(b, o)}${srcFlag(d)}${warnFlag(o)}</div>
+      <div class="acts">${addBtn(b, oi)}${favBtn(b)}${b.outlets.length > 1 ? "" : mapBtn(b, o)}${srcFlag(d)}${warnFlag(o)}</div>
       ${outletsBlock(b)}
     </article>`;
   }
@@ -205,7 +207,7 @@
       <div><div class="name">${esc(b.name)}</div>${sub(o, dist)}</div>
       <span class="pill quiet">Ask</span>
       <div class="deal">${esc(d.text)}</div>
-      <div class="acts">${addBtn(b, oi)}${b.outlets.length > 1 ? "" : mapBtn(b, o)}${srcFlag(d)}</div>
+      <div class="acts">${addBtn(b, oi)}${favBtn(b)}${b.outlets.length > 1 ? "" : mapBtn(b, o)}${srcFlag(d)}</div>
       ${outletsBlock(b)}
     </article>`;
   }
@@ -214,10 +216,56 @@
       <div class="tile">${ico("glasses")}</div>
       <div><div class="name">${esc(b.name)}</div>${sub(o, dist)}</div>
       <span class="till">${ico("moon")}${fmt(clock(s.e % 1440))}</span>
+      ${favBtn(b)}
       ${inCrawl(b.id)
         ? `<button class="btn icon" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="true" aria-label="Remove from crawl">${ico("check")}</button>`
         : `<button class="btn icon" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="false" aria-label="Add to crawl">${ico("plus")}</button>`}
     </div>`;
+  }
+
+  // ---- favourites: your saved bars and their deals across the week ----
+  const WEEK = [1, 2, 3, 4, 5, 6, 0];
+  function favDealsOn(b, day) {
+    const out = [];
+    for (const d of b.deals) {
+      if (d.untimed) continue;
+      const outs = b.outlets.filter((o) => (!d.only || d.only.includes(o.area)));
+      if (!outs.length) continue;
+      if (d.allDay) {
+        const open = outs.map((o) => hoursOn(o, day)).filter((h) => h && h.length);
+        if (open.length) out.push({ d, outs, time: "Whenever open" });
+      } else if (d.days.includes(day)) out.push({ d, outs, time: `${d.approx ? "~" : ""}${fmt(toMin(d.s))}–${fmt(toMin(d.e))}`, s: toMin(d.s) });
+    }
+    return out;
+  }
+  function renderFavs() {
+    const bars = DATA.bars.filter((b) => isFav(b.id));
+    $("favDays").innerHTML = [["week", "Week"], ...WEEK.map((d) => [String(d), DAYS[d]])]
+      .map(([v, l]) => `<button class="chip ${v === String(istNow().day) ? "today" : ""}" type="button" data-fd="${v}" aria-pressed="${st.favDay === v}">${l}</button>`).join("");
+    if (!bars.length) {
+      $("favOut").innerHTML = `<div class="empty">${ico("heart")}Tap the heart on any bar to save it here.</div>`; return;
+    }
+    const nearest = (outs) => outs.map((o) => ({ o, d: km(here(), o.ll) })).sort((a, b) => a.d - b.d)[0];
+    const row = (b, x) => { const n = nearest(x.outs); return `<div class="fdeal">
+        <div class="tile">${ico(drinkIcon(x.d))}</div>
+        <div><div class="name">${esc(b.name)}</div><div class="sub">${esc(x.d.text)}</div></div>
+        <div class="ftime">${x.time}<small>${esc(n.o.area)}${x.outs.length > 1 ? ` +${x.outs.length - 1}` : ""}</small></div>
+      </div>`; };
+    const days = st.favDay === "week" ? WEEK : [+st.favDay];
+    const today = istNow().day;
+    let html = days.map((day) => {
+      const items = [];
+      for (const b of bars) for (const x of favDealsOn(b, day)) items.push([b, x]);
+      items.sort((a, b) => (a[1].s ?? 9999) - (b[1].s ?? 9999));
+      return `<div class="group">${DAYS_LONG[day]}${day === today ? ` <span class="todaytag">today</span>` : ""}<span class="n">${items.length}</span></div>` +
+        (items.length ? `<div class="list">${items.map(([b, x]) => row(b, x)).join("")}</div>` : `<p class="nodeal">No deals at your favourites.</p>`);
+    }).join("");
+    const untimed = bars.flatMap((b) => b.deals.filter((d) => d.untimed).map((d) => [b, d]));
+    if (untimed.length) html += `<div class="group">Any day · times not listed<span class="n">${untimed.length}</span></div><div class="list">${untimed.map(([b, d]) => row(b, { d, outs: b.outlets.filter((o) => !d.only || d.only.includes(o.area)), time: "Ask" })).join("")}</div>`;
+    const none = bars.filter((b) => !b.deals.length);
+    if (none.length) html += `<div class="group">No deals listed<span class="n">${none.length}</span></div>` + none.map((b) => `<div class="mini"><div class="tile">${ico("glasses")}</div><div><div class="name">${esc(b.name)}</div></div><span></span>${favBtn(b)}</div>`).join("");
+    html += `<div class="group">Saved<span class="n">${bars.length}</span></div><div class="favlist">${bars.map((b) => `<span class="favchip">${esc(b.name)}<button type="button" data-fav="${b.id}" aria-label="Remove ${esc(b.name)}">${ico("x")}</button></span>`).join("")}</div>`;
+    $("favOut").innerHTML = html;
   }
 
   // ---- crawl ----
@@ -428,13 +476,16 @@
     $("nowBtn").hidden = st.live;
     document.querySelectorAll("[data-f]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.f === st.f));
     const isDeals = st.tab === "deals";
-    $("tabDeals").setAttribute("aria-selected", isDeals); $("tabCrawl").setAttribute("aria-selected", !isDeals);
-    $("deals").hidden = !isDeals; $("crawl").hidden = isDeals;
+    for (const [tab, sec] of [["tabDeals", "deals"], ["tabCrawl", "crawl"], ["tabFavs", "favs"]]) {
+      $(tab).setAttribute("aria-selected", st.tab === sec); $(sec).hidden = st.tab !== sec;
+    }
+    document.body.dataset.tab = st.tab;
+    $("favCount").textContent = st.favs.length || "";
     const pins = st.crawl.length;
     $("startLbl").textContent = st.area === ME ? "Starting from you" : `Start: ${st.area}`;
     const rad = +$("radius").value;
     $("planHint").textContent = `Starts ${st.area === ME ? "where you are" : "in " + st.area} at ${fmt(clock(st.t))}, ${rad ? `stays within ${rad} km` : st.area === ME ? "stays within 2 km" : `only ${st.area} bars`}${pins ? `, keeps your ${pins} pick${pins > 1 ? "s" : ""}` : ""}.`;
-    if (isDeals) renderDeals(); else showCrawl(false);
+    if (isDeals) renderDeals(); else if (st.tab === "favs") renderFavs(); else showCrawl(false);
     $("crawlCount").textContent = st.crawl.length || "";
   }
 
@@ -459,6 +510,7 @@
     document.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { st.f = b.dataset.f; store.set("crawlr.filter", st.f); render(); }));
     $("tabDeals").addEventListener("click", () => { st.tab = "deals"; render(); });
     $("tabCrawl").addEventListener("click", () => { st.tab = "crawl"; render(); });
+    $("tabFavs").addEventListener("click", () => { st.tab = "favs"; render(); });
     $("planBtn").addEventListener("click", () => showCrawl(true));
     $("stay").addEventListener("change", () => showCrawl(false));
     $("radius").addEventListener("change", () => render());
@@ -472,6 +524,14 @@
       const rm = e.target.closest("[data-rm]");
       if (rm) { st.crawl = st.crawl.filter((c) => c.bar !== rm.dataset.rm); store.set("crawlr.crawl", st.crawl); render(); return; }
       if (e.target.id === "moreOpen") { st.moreOpen += 20; render(); return; }
+      const fv = e.target.closest("[data-fav]");
+      if (fv) {
+        const id = fv.dataset.fav;
+        st.favs = isFav(id) ? st.favs.filter((x) => x !== id) : [...st.favs, id];
+        store.set("crawlr.favs", st.favs); render(); return;
+      }
+      const fd = e.target.closest("[data-fd]");
+      if (fd) { st.favDay = fd.dataset.fd; renderFavs(); return; }
       if (e.target.closest("#wideBtn")) { st.wide = !st.wide; st.moreOpen = 12; render(); return; }
       if (e.target.closest("#optBtn")) {
         const r = optimizeCrawl(+$("stay").value);
@@ -487,6 +547,7 @@
     module.exports = { bd, clock, dealStatus, hoursOn,
       setup: (d, s) => { DATA = d; Object.assign(st, s); },
       planCrawl: (n, stay, opts) => planCrawl(n, stay, Object.assign({ radius: 0 }, opts)), collect: () => collect(),
+      favs: (ids, day) => { st.favs = ids; st.favDay = day; return DATA.bars.filter((b) => ids.includes(b.id)).map((b) => [b.name, WEEK.map((d) => favDealsOn(b, d).length)]); },
       optimize: (crawl, stay) => { st.crawl = crawl; const r = optimizeCrawl(stay); return { r, crawl: st.crawl, stops: layoutManual(stay) }; } };
     return;
   }

@@ -192,3 +192,23 @@ details.outs li.here span:first-child{color:var(--amber)}
 .areas{padding-top:4px}
 .mini .till{display:inline-flex;align-items:center;gap:4px}
 .mini .till .i{width:13px;height:13px}
+/* favourites */
+.btn.fav.on{color:var(--amber);border-color:var(--amber-line)}
+.btn.fav.on .i{fill:var(--amber)}
+.mini{grid-template-columns:32px 1fr auto auto auto}
+.chip.today{border-color:var(--amber-line)}
+.todaytag{font-size:10px;letter-spacing:.06em;background:var(--amber);color:var(--amber-ink);border-radius:999px;padding:2px 7px}
+.fdeal{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;background:var(--surface);border-radius:16px;padding:10px 12px}
+.fdeal > div{min-width:0}
+.fdeal .tile{width:36px;height:36px;border-radius:10px;grid-row:auto;background:var(--amber-soft);color:var(--amber)}
+.fdeal .tile .i{width:20px;height:20px}
+.fdeal .name{font-size:15px}
+.fdeal .sub{white-space:normal}
+.ftime{text-align:right;font-weight:700;font-size:13px;color:var(--amber);white-space:nowrap}
+.ftime small{display:block;font-weight:500;font-size:11.5px;color:var(--faint)}
+.nodeal{margin:0 2px;font-size:13px;color:var(--faint)}
+.favlist{display:flex;flex-wrap:wrap;gap:6px}
+.favchip{display:inline-flex;align-items:center;gap:4px;background:var(--surface);border-radius:999px;padding:4px 4px 4px 12px;font-size:13px;font-weight:600}
+.favchip button{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;border:0;background:var(--surface2);color:var(--muted);cursor:pointer}
+.favchip .i{width:13px;height:13px}
+body[data-tab="favs"] .controls,body[data-tab="favs"] .areas,body[data-tab="favs"] .locprompt{display:none}
