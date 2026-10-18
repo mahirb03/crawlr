@@ -269,22 +269,51 @@
     return stops;
   }
 
-  // Lay out a hand-picked crawl in deal-time order, from the start area.
-  function layoutManual(stay) {
-    let pos = DATA.areas[st.area], t = st.t;
-    const picks = st.crawl.map((c) => {
-      const b = DATA.bars.find((x) => x.id === c.bar); if (!b) return null;
-      const o = b.outlets[c.outlet] || b.outlets[0];
-      const ds = dealsFor(b, o).map((d) => ({ d, s: dealStatus(d, o, st.day, st.t) })).filter((x) => x.s).sort((x, y) => x.s.s - y.s.s);
-      return { b, o, oi: b.outlets.indexOf(o), d: ds[0] ? ds[0].d : (dealsFor(b, o)[0] || null), ws: ds[0] ? ds[0].s.s : 9999 };
-    }).filter(Boolean).sort((a, b) => a.ws - b.ws);
-    return picks.map((p) => {
+  // Lay out the crawl in its saved order, starting from the chosen area.
+  function pickOf(c) {
+    const b = DATA.bars.find((x) => x.id === c.bar); if (!b) return null;
+    const o = b.outlets[c.outlet] || b.outlets[0];
+    const ds = dealsFor(b, o).filter((d) => !d.untimed);
+    return { b, o, oi: b.outlets.indexOf(o), deals: ds, d: ds[0] || dealsFor(b, o)[0] || null };
+  }
+  function simulate(picks, stay) {
+    let pos = DATA.areas[st.area], t = st.t, cost = 0, travelTotal = 0;
+    const out = picks.map((p) => {
       const dist = km(pos, p.o.ll), h1 = hop(dist), arrive = t + h1.mins;
-      const s = p.d ? dealStatus(p.d, p.o, st.day, arrive) : null;
-      const start = s && s.k === "later" ? arrive + s.inn : arrive;
+      // use whichever of this bar's deals is best at arrival time
+      let d = p.d, wait = 0, miss = p.deals.length > 0;
+      for (const x of p.deals) {
+        const s = dealStatus(x, p.o, st.day, arrive);
+        if (s && s.k === "on") { d = x; wait = 0; miss = false; break; }
+        if (s && s.k === "later" && s.inn <= 60) { d = x; wait = s.inn; miss = false; }
+      }
+      const h = hoursOn(p.o, st.day);
+      const closed = h && !h.some(([a2, e]) => arrive + wait >= a2 && arrive + wait < e);
+      const start = arrive + wait;
+      cost += h1.mins + wait + (miss ? 45 : 0) + (closed ? 90 : 0);
+      travelTotal += h1.mins;
       pos = p.o.ll; t = start + stay;
-      return { ...p, dist, travel: h1.mins, walk: h1.walk, arrive, start };
+      return { ...p, d, dist, travel: h1.mins, walk: h1.walk, arrive, start };
     });
+    return { stops: out, cost, travelTotal };
+  }
+  function layoutManual(stay) {
+    return simulate(st.crawl.map(pickOf).filter(Boolean), stay).stops;
+  }
+  // Try every order (up to 7 stops) and keep the one with the least travel, waiting and missed deals.
+  function optimizeCrawl(stay) {
+    const picks = st.crawl.map(pickOf).filter(Boolean);
+    if (picks.length < 2) return null;
+    const before = simulate(picks, stay);
+    let best = before, bestOrder = picks;
+    const perm = (arr, k = 0) => {
+      if (k === arr.length) { const r = simulate(arr, stay); if (r.cost < best.cost) { best = r; bestOrder = arr.slice(); } return; }
+      for (let i = k; i < arr.length; i++) { [arr[k], arr[i]] = [arr[i], arr[k]]; perm(arr, k + 1); [arr[k], arr[i]] = [arr[i], arr[k]]; }
+    };
+    if (picks.length <= 7) perm(picks.slice());
+    st.crawl = bestOrder.map((p) => ({ bar: p.b.id, outlet: p.oi }));
+    store.set("crawlr.crawl", st.crawl);
+    return { saved: before.travelTotal - best.travelTotal, changed: bestOrder !== picks && best !== before };
   }
 
   function renderCrawl(stops, auto) {
@@ -319,7 +348,12 @@
         </article>
       </li>`; }).join("")}</ol>
       <p class="note">${ico("clock")}${fmt(clock(stops[0].start))} – ${fmt(clock(end))} · ${stops.length} stops</p>
-      <a class="route" href="${route}" target="_blank" rel="noopener">${ico("map")}Open route in Maps</a>`;
+      <div class="crawlacts">
+        ${stops.length > 1 ? `<button class="go ghost" type="button" id="optBtn">${ico("spark")}Optimize route</button>` : ""}
+        <a class="route" href="${route}" target="_blank" rel="noopener">${ico("map")}Open in Maps</a>
+      </div>
+      ${st.optMsg ? `<p class="note">${ico("check")}${st.optMsg}</p>` : ""}`;
+    st.optMsg = "";
   }
 
   function showCrawl(auto) {
@@ -332,6 +366,26 @@
     } else renderCrawl(layoutManual(stay), false);
   }
 
+  // ---- your location ----
+  const ME = "My location", MUMBAI = [19.07, 72.88];
+  function setMe(ll) {
+    DATA.areas[ME] = ll; st.area = ME; store.set("crawlr.area", ME);
+    store.set("crawlr.loc", { ll, ts: Date.now() });
+  }
+  function useMyLocation() {
+    const msg = (t) => { $("locMsg").textContent = t; $("locMsg").hidden = !t; };
+    store.set("crawlr.asked", 1); $("locPrompt").hidden = true;
+    if (!navigator.geolocation) { msg("Location isn't available in this browser. Pick an area instead."); return; }
+    msg("Finding you…");
+    navigator.geolocation.getCurrentPosition((pos) => {
+      const ll = [pos.coords.latitude, pos.coords.longitude];
+      if (km(ll, MUMBAI) > 60) { msg("You look to be outside Mumbai. Pick an area instead."); return; }
+      msg(""); setMe(ll); st.moreOpen = 12; renderAreas(); render();
+    }, (err) => {
+      msg(err.code === 1 ? "Location is blocked for this site. Allow it in your browser, or pick an area." : "Couldn't get your location. Pick an area instead.");
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 120000 });
+  }
+
   // ---- area tiles: every area, busiest first, each with its own warm gradient ----
   const GRADS = [["#7A3E12","#E39B3B"],["#5B1F2A","#C2525E"],["#2F3B1A","#A3A13C"],["#4A2A12","#C7773A"],["#3B1F3F","#B0587E"],["#1F3138","#3E8C8C"],["#3D2B13","#D8B25A"],["#4B1714","#D4633C"]];
   const AREA_ICONS = ["beer", "wine", "cocktail", "cheers", "shot", "glasses"];
@@ -339,7 +393,10 @@
     const counts = {};
     for (const b of DATA.bars) for (const o of b.outlets) counts[o.area] = (counts[o.area] || 0) + 1;
     const names = Object.keys(DATA.areas).filter((a) => counts[a]).sort((a, b) => (a === st.area ? -1 : b === st.area ? 1 : counts[b] - counts[a]));
-    $("areas").innerHTML = names.map((a, i) => {
+    const meOn = st.area === ME && DATA.areas[ME];
+    const nearby = meOn ? DATA.bars.reduce((n, b) => n + b.outlets.filter((o) => km(DATA.areas[ME], o.ll) <= 2).length, 0) : 0;
+    const meTile = `<button class="area me" type="button" role="radio" data-me="1" aria-checked="${!!meOn}">${ico("pin")}<b>Near me</b><small>${meOn ? `${nearby} bars within 2 km` : "Use my location"}</small></button>`;
+    $("areas").innerHTML = meTile + names.map((a, i) => {
       let h = 0; for (const c of a) h = (h * 31 + c.charCodeAt(0)) >>> 0;
       const [g1, g2] = GRADS[h % GRADS.length];
       return `<button class="area" type="button" role="radio" data-area="${esc(a)}" aria-checked="${a === st.area}" style="--g:linear-gradient(135deg,${g1},${g2})">
@@ -359,19 +416,27 @@
     $("tabDeals").setAttribute("aria-selected", isDeals); $("tabCrawl").setAttribute("aria-selected", !isDeals);
     $("deals").hidden = !isDeals; $("crawl").hidden = isDeals;
     const pins = st.crawl.length;
-    $("planHint").textContent = `Starts in ${st.area} at ${fmt(clock(st.t))}, stays within ${$("radius").value} km${pins ? `, keeps your ${pins} pick${pins > 1 ? "s" : ""}` : ""}.`;
+    $("startLbl").textContent = st.area === ME ? "Starting from you" : `Start: ${st.area}`;
+    $("planHint").textContent = `Starts ${st.area === ME ? "where you are" : "in " + st.area} at ${fmt(clock(st.t))}, stays within ${$("radius").value} km${pins ? `, keeps your ${pins} pick${pins > 1 ? "s" : ""}` : ""}.`;
     if (isDeals) renderDeals(); else showCrawl(false);
     $("crawlCount").textContent = st.crawl.length || "";
   }
 
   function wire() {
     $("day").innerHTML = [1, 2, 3, 4, 5, 6, 0].map((d) => `<option value="${d}">${DAYS_LONG[d]}</option>`).join("");
+    const saved = store.get("crawlr.loc", null);
+    if (st.area === ME && saved && Date.now() - saved.ts < 6 * 3600e3) DATA.areas[ME] = saved.ll;
     if (!DATA.areas[st.area]) st.area = "Bandra West";
     renderAreas();
+    if (!store.get("crawlr.asked", null)) $("locPrompt").hidden = false;
+    $("locYes").addEventListener("click", useMyLocation);
+    $("locNo").addEventListener("click", () => { store.set("crawlr.asked", 1); $("locPrompt").hidden = true; $("areas").scrollIntoView({ behavior: "smooth", block: "center" }); });
+    $("startBtn").addEventListener("click", useMyLocation);
     $("day").addEventListener("change", (e) => { st.live = false; st.day = +e.target.value; render(); });
     $("time").addEventListener("change", (e) => { if (!e.target.value) return; st.live = false; st.t = bd(toMin(e.target.value)); render(); });
     $("nowBtn").addEventListener("click", () => { st.live = true; render(); });
     $("areas").addEventListener("click", (e) => {
+      if (e.target.closest("[data-me]")) { useMyLocation(); return; }
       const t = e.target.closest("[data-area]"); if (!t) return;
       st.area = t.dataset.area; store.set("crawlr.area", st.area); st.moreOpen = 12; renderAreas(); render();
     });
@@ -390,7 +455,12 @@
       }
       const rm = e.target.closest("[data-rm]");
       if (rm) { st.crawl = st.crawl.filter((c) => c.bar !== rm.dataset.rm); store.set("crawlr.crawl", st.crawl); render(); return; }
-      if (e.target.id === "moreOpen") { st.moreOpen += 20; render(); }
+      if (e.target.id === "moreOpen") { st.moreOpen += 20; render(); return; }
+      if (e.target.closest("#optBtn")) {
+        const r = optimizeCrawl(+$("stay").value);
+        st.optMsg = !r || !r.changed ? "Already the best order." : r.saved > 0 ? `Reordered. About ${r.saved} min less travel.` : "Reordered so you catch more deals.";
+        showCrawl(false);
+      }
     });
     setInterval(() => { if (st.live) render(); }, 60000);
   }
@@ -399,7 +469,8 @@
   if (typeof module !== "undefined") {
     module.exports = { bd, clock, dealStatus, hoursOn,
       setup: (d, s) => { DATA = d; Object.assign(st, s); },
-      planCrawl: (n, stay, opts) => planCrawl(n, stay, Object.assign({ radius: 3 }, opts)), collect: () => collect() };
+      planCrawl: (n, stay, opts) => planCrawl(n, stay, Object.assign({ radius: 3 }, opts)), collect: () => collect(),
+      optimize: (crawl, stay) => { st.crawl = crawl; const r = optimizeCrawl(stay); return { r, crawl: st.crawl, stops: layoutManual(stay) }; } };
     return;
   }
   fetch("data/bars.json").then((r) => r.json()).then((d) => {

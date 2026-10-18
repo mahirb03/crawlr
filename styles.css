@@ -166,3 +166,17 @@ details.outs li a{color:var(--amber);display:inline-flex}
 .area[aria-checked="true"] small{color:var(--amber)}
 .planhint{margin:0;font-size:12.5px;color:var(--muted)}
 .planrow .sel{min-width:140px}
+.crawlacts{display:flex;gap:8px;margin-top:8px}
+.crawlacts > *{flex:1;margin:0}
+.go.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.locprompt{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px 12px;background:var(--surface);border-radius:var(--r);padding:14px;margin:0 0 12px}
+.locprompt b{font-size:16px;font-weight:700}
+.locbtns{grid-column:1/-1;display:flex;gap:8px}
+.locbtns .btn{flex:1;justify-content:center;height:40px}
+.badge.sm{font-size:34px}
+.locmsg{font-size:13px;color:var(--warn);margin:0 2px 10px}
+.area.me{background:var(--surface2)}
+.area.me::before{background:radial-gradient(circle at 80% 20%,rgba(242,169,59,.35),transparent 60%)}
+.area.me .i{opacity:.55;color:var(--amber)}
+.sel.start{width:100%;color:var(--ink);font-weight:600;font-size:14px;background:var(--surface2)}
+.sel.start .uselink{margin-left:auto;color:var(--amber);font-size:13px}

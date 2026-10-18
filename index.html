@@ -19,6 +19,12 @@
   </header>
 
   <h1 class="hero">Happy hour,<br>near <span class="badge" aria-hidden="true"><svg class="i"><use href="#i-beer"/></svg></span> you.</h1>
+  <div class="locprompt" id="locPrompt" hidden>
+    <span class="badge sm" aria-hidden="true"><svg class="i"><use href="#i-pin"/></svg></span>
+    <b>Where are you starting?</b>
+    <div class="locbtns"><button class="btn fill" type="button" id="locYes"><svg class="i"><use href="#i-pin"/></svg>Use my location</button><button class="btn" type="button" id="locNo">Pick an area</button></div>
+  </div>
+  <p class="locmsg" id="locMsg" hidden></p>
   <div class="areas" id="areas" role="radiogroup" aria-label="Near"></div>
 
   <div class="controls">
@@ -39,6 +45,7 @@
 
   <section id="crawl" role="tabpanel" aria-labelledby="tabCrawl" hidden>
     <div class="plan">
+      <button class="sel start" type="button" id="startBtn" title="Start from your current location"><svg class="i"><use href="#i-pin"/></svg><span id="startLbl">Start</span><span class="uselink">Use my location</span></button>
       <div class="planrow">
         <label class="sel" title="Stops"><svg class="i"><use href="#i-route"/></svg><select id="stops" aria-label="Stops"><option value="2">2 stops</option><option value="3" selected>3 stops</option><option value="4">4 stops</option><option value="5">5 stops</option></select></label>
         <label class="sel" title="Time at each bar"><svg class="i"><use href="#i-clock"/></svg><select id="stay" aria-label="Time at each bar"><option value="45">45 min each</option><option value="60" selected>1 hr each</option><option value="90">1.5 hr each</option></select></label>
