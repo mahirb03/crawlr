@@ -79,6 +79,12 @@
   };
   const sync = () => { if (st.live) { const n = istNow(); st.day = n.day; st.t = n.t; } };
   const here = () => DATA.areas[st.area];
+  // Is this outlet in the chosen neighbourhood? "My location" means within 2 km (or more when widened).
+  // extraKm > 0 also lets in outlets of other areas within that distance of the centre.
+  function inArea(o, extraKm = 0) {
+    if (st.area === "My location") return km(here(), o.ll) <= Math.max(2, extraKm);
+    return o.area === st.area || (extraKm > 0 && km(here(), o.ll) <= extraKm);
+  }
   const passes = (d) => st.f === "all" || (d.tags || []).includes(st.f);
   const inCrawl = (id) => st.crawl.some((c) => c.bar === id);
 
@@ -88,6 +94,7 @@
     for (const b of DATA.bars) {
       let best = null, bestU = null;
       b.outlets.forEach((o, oi) => {
+        if (!inArea(o, st.wide ? 3 : 0)) return;
         const dist = km(here(), o.ll);
         for (const d of dealsFor(b, o)) {
           if (!passes(d)) continue;
@@ -112,6 +119,7 @@
       if (dealOutletKeys.has(b.id)) continue;
       let best = null;
       b.outlets.forEach((o, oi) => {
+        if (!inArea(o, st.wide ? 3 : 0)) return;
         const h = hoursOn(o, st.day); if (!h) return;
         const s = windowStatus(h, st.t); if (!s || s.k !== "on") return;
         const dist = km(here(), o.ll);
@@ -141,7 +149,8 @@
   function renderDeals() {
     const { timed, untimed, open } = collect();
     const on = timed.filter((r) => r.s.k === "on"), later = timed.filter((r) => r.s.k === "later"), done = timed.filter((r) => r.s.k === "done");
-    $("summary").innerHTML = `<span><span class="dot"></span><b>${on.length}</b> on now</span>` +
+    const areaName = st.area === "My location" ? "Near you" : st.area;
+    $("summary").innerHTML = `<span class="where">${ico("pin")}<b>${esc(areaName)}</b></span><span><span class="dot"></span><b>${on.length}</b> on now</span>` +
       (later.length ? `<span><b>${later.length}</b> later</span>` : "") +
       (st.f === "all" ? `<span><b>${open.length}</b> other bars open</span>` : "");
     const sect = (title, list, fn) => list.length ? `<div class="group">${title}<span class="n">${list.length}</span></div><div class="list">${list.map(fn).join("")}</div>` : "";
@@ -153,7 +162,8 @@
       sect("Done for today", done, card) +
       (showOpen ? sect("Also open", shownOpen, rowOpen) +
         (open.length > st.moreOpen ? `<button class="more" type="button" id="moreOpen">Show more</button>` : "") : "")) ||
-      `<div class="empty">${ico("glasses")}Nothing here on ${DAYS_LONG[st.day]}.</div>`;
+      `<div class="empty">${ico("glasses")}Nothing in ${esc(areaName)} right now.</div>`;
+    $("list").insertAdjacentHTML("beforeend", `<button class="more wide" type="button" id="wideBtn">${ico(st.wide ? "x" : "plus")}${st.wide ? `Only ${esc(areaName)}` : "Include nearby areas (3 km)"}</button>`);
   }
 
   const pct = (m) => (m / 1440 * 100).toFixed(2) + "%";
@@ -168,7 +178,7 @@
     if (b.outlets.length < 2) return "";
     return `<details class="outs"><summary>${ico("store")}${b.outlets.length} outlets</summary><ul>${
       b.outlets.map((x) => ({ x, d: km(here(), x.ll) })).sort((p, q) => p.d - q.d)
-        .map(({ x, d }) => `<li><span>${esc(x.area)} · ${esc(x.label)}</span><span class="r">${x.status !== "open" ? ico("warn") : ""}${kmLabel(d)}<a href="${mapsUrl(b, x)}" target="_blank" rel="noopener" aria-label="Map">${ico("map")}</a></span></li>`).join("")
+        .map(({ x, d }) => `<li class="${inArea(x) ? "here" : ""}"><span>${esc(x.area)} · ${esc(x.label)}</span><span class="r">${x.status !== "open" ? ico("warn") : ""}${kmLabel(d)}<a href="${mapsUrl(b, x)}" target="_blank" rel="noopener" aria-label="Map">${ico("map")}</a></span></li>`).join("")
     }</ul></details>`;
   }
   function card({ b, o, oi, d, s, dist }) {
@@ -231,7 +241,7 @@
         b.outlets.forEach((o, oi) => {
           if (isPinned && pinned.get(b.id) !== oi) return;
           const fromCentre = km(centre, o.ll);
-          if (!isPinned && fromCentre > opts.radius) return;
+          if (!isPinned && !inArea(o, opts.radius)) return;
           if (!isPinned && o.status !== "open" && !opts.unconfirmed) return;
           const dist = km(pos, o.ll), h1 = i === 0 && dist < 0.3 ? { mins: 0, walk: true } : hop(dist), arrive = t + h1.mins;
           const h = hoursOn(o, st.day);
@@ -417,7 +427,8 @@
     $("deals").hidden = !isDeals; $("crawl").hidden = isDeals;
     const pins = st.crawl.length;
     $("startLbl").textContent = st.area === ME ? "Starting from you" : `Start: ${st.area}`;
-    $("planHint").textContent = `Starts ${st.area === ME ? "where you are" : "in " + st.area} at ${fmt(clock(st.t))}, stays within ${$("radius").value} km${pins ? `, keeps your ${pins} pick${pins > 1 ? "s" : ""}` : ""}.`;
+    const rad = +$("radius").value;
+    $("planHint").textContent = `Starts ${st.area === ME ? "where you are" : "in " + st.area} at ${fmt(clock(st.t))}, ${rad ? `stays within ${rad} km` : st.area === ME ? "stays within 2 km" : `only ${st.area} bars`}${pins ? `, keeps your ${pins} pick${pins > 1 ? "s" : ""}` : ""}.`;
     if (isDeals) renderDeals(); else showCrawl(false);
     $("crawlCount").textContent = st.crawl.length || "";
   }
@@ -438,7 +449,7 @@
     $("areas").addEventListener("click", (e) => {
       if (e.target.closest("[data-me]")) { useMyLocation(); return; }
       const t = e.target.closest("[data-area]"); if (!t) return;
-      st.area = t.dataset.area; store.set("crawlr.area", st.area); st.moreOpen = 12; renderAreas(); render();
+      st.area = t.dataset.area; store.set("crawlr.area", st.area); st.moreOpen = 12; st.wide = false; renderAreas(); render();
     });
     document.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { st.f = b.dataset.f; store.set("crawlr.filter", st.f); render(); }));
     $("tabDeals").addEventListener("click", () => { st.tab = "deals"; render(); });
@@ -456,6 +467,7 @@
       const rm = e.target.closest("[data-rm]");
       if (rm) { st.crawl = st.crawl.filter((c) => c.bar !== rm.dataset.rm); store.set("crawlr.crawl", st.crawl); render(); return; }
       if (e.target.id === "moreOpen") { st.moreOpen += 20; render(); return; }
+      if (e.target.closest("#wideBtn")) { st.wide = !st.wide; st.moreOpen = 12; render(); return; }
       if (e.target.closest("#optBtn")) {
         const r = optimizeCrawl(+$("stay").value);
         st.optMsg = !r || !r.changed ? "Already the best order." : r.saved > 0 ? `Reordered. About ${r.saved} min less travel.` : "Reordered so you catch more deals.";
@@ -469,7 +481,7 @@
   if (typeof module !== "undefined") {
     module.exports = { bd, clock, dealStatus, hoursOn,
       setup: (d, s) => { DATA = d; Object.assign(st, s); },
-      planCrawl: (n, stay, opts) => planCrawl(n, stay, Object.assign({ radius: 3 }, opts)), collect: () => collect(),
+      planCrawl: (n, stay, opts) => planCrawl(n, stay, Object.assign({ radius: 0 }, opts)), collect: () => collect(),
       optimize: (crawl, stay) => { st.crawl = crawl; const r = optimizeCrawl(stay); return { r, crawl: st.crawl, stops: layoutManual(stay) }; } };
     return;
   }
