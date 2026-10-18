@@ -75,6 +75,12 @@ details[open] summary::before{content:"– "}
 .outlets li{display:flex;justify-content:space-between;gap:10px}
 .outlets li span:first-child{min-width:0}
 .outlets a{color:var(--accent);font-weight:600;text-decoration:none;white-space:nowrap}
+.hint{font-size:13px;color:var(--muted);margin:2px 0 0}
+.row.compact{padding:12px 0}
+.row.compact .name{font-size:16px}
+.more{display:block;margin:14px 0 0}
+.meta.warn,.warn{color:var(--warn)}
+.stop .right{text-align:right}
 .empty{color:var(--muted);padding:28px 0;text-align:center}
 
 /* crawl */

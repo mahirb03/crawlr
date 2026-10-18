@@ -17,7 +17,7 @@
   <header>
     <h1 class="mark">crawl<span>r</span></h1>
   </header>
-  <p class="lede">Happy hours and bar deals across Mumbai. See what's on now, then plan a bar hop.</p>
+  <p class="lede">Happy hours and bar deals across Mumbai, nearest first. See what's on now, then plan a bar hop.</p>
 
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" id="tabDeals" aria-selected="true" aria-controls="deals">Deals</button>
@@ -50,7 +50,8 @@
         <span class="field"><label for="stops">Stops</label><select id="stops"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></span>
         <span class="field"><label for="stay">At each</label><select id="stay"><option value="45">45 min</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option></select></span>
       </div>
-      <label class="check"><input type="checkbox" id="incUnconf"> Include bars I couldn't confirm are open</label>
+      <label class="check"><input type="checkbox" id="fill" checked> Fill gaps with open bars that have no listed deal</label>
+      <label class="check"><input type="checkbox" id="incUnconf"> Include bars whose hours aren't on Google</label>
       <button class="go" type="button" id="planBtn">Plan my crawl</button>
     </div>
     <div id="crawlOut"></div>

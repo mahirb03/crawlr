@@ -34,3 +34,15 @@ Everything lives in `data/bars.json`:
   - `status`: `open` (confirmed on Google with hours) or `unconfirmed`.
 
 Bump `updated` when you re-check the list.
+
+## Rebuilding the bar list
+
+`data/bars.json` is generated. Edit `scripts/curated.json` (deals, extra outlets) and run:
+
+```
+python3 scripts/build_data.py scripts/places.json
+```
+
+`scripts/places.json` holds the verified Google listings: hours, coordinates and review snippets that mention deals. A bar only goes in the list if Google has its opening hours, unless it's named under `keep_unconfirmed`.
+
+Deals can also be `untimed` (reported, but no times published) or `allDay` (runs whenever the bar is open).

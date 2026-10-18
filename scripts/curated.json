@@ -1,0 +1,966 @@
+{
+ "updated": "2026-10-18",
+ "keep_unconfirmed": [
+  "Jughead's",
+  "Hoppipola",
+  "Reunion",
+  "Kalaghoda Dive",
+  "Harry's Bar + Cafe",
+  "Thirsty City 127"
+ ],
+ "extra_outlets": [
+  {
+   "brand": "Craftbar",
+   "area": "BKC",
+   "label": "Hallmark Business Plaza, Bandra East",
+   "ll": [
+    19.0606,
+    72.8517
+   ],
+   "status": "open",
+   "hours": {
+    "0": [
+     [
+      "12:30",
+      "01:30"
+     ]
+    ],
+    "1": [
+     [
+      "12:30",
+      "01:30"
+     ]
+    ],
+    "2": [
+     [
+      "12:30",
+      "01:30"
+     ]
+    ],
+    "3": [
+     [
+      "12:30",
+      "01:30"
+     ]
+    ],
+    "4": [
+     [
+      "12:30",
+      "01:30"
+     ]
+    ],
+    "5": [
+     [
+      "12:30",
+      "01:30"
+     ]
+    ],
+    "6": [
+     [
+      "12:30",
+      "01:30"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "The Goose & Gridiron",
+   "area": "Fort",
+   "label": "Murzban Street, opp. Sterling Cinema",
+   "ll": [
+    18.9381,
+    72.8333
+   ],
+   "status": "open",
+   "hours": {
+    "0": [
+     [
+      "12:00",
+      "00:00"
+     ]
+    ],
+    "1": [
+     [
+      "12:00",
+      "00:00"
+     ]
+    ],
+    "2": [
+     [
+      "12:00",
+      "00:00"
+     ]
+    ],
+    "3": [
+     [
+      "12:00",
+      "00:00"
+     ]
+    ],
+    "4": [
+     [
+      "12:00",
+      "00:00"
+     ]
+    ],
+    "5": [
+     [
+      "12:00",
+      "00:00"
+     ]
+    ],
+    "6": [
+     [
+      "12:00",
+      "00:00"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Punchline",
+   "area": "Bandra West",
+   "label": "Geliki Building, Reclamation",
+   "ll": [
+    19.0493,
+    72.8292
+   ],
+   "status": "open",
+   "hours": {
+    "1": [],
+    "2": [
+     [
+      "17:00",
+      "01:30"
+     ]
+    ],
+    "3": [
+     [
+      "17:00",
+      "01:30"
+     ]
+    ],
+    "4": [
+     [
+      "17:00",
+      "01:30"
+     ]
+    ],
+    "5": [
+     [
+      "17:00",
+      "01:30"
+     ]
+    ],
+    "6": [
+     [
+      "17:00",
+      "01:30"
+     ]
+    ],
+    "0": [
+     [
+      "17:00",
+      "01:30"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Idoru",
+   "area": "Khar",
+   "label": "Road 24, above Izumi, Khar West",
+   "ll": [
+    19.0643,
+    72.8329
+   ],
+   "status": "open",
+   "hours": {
+    "2": [],
+    "1": [
+     [
+      "18:30",
+      "00:30"
+     ]
+    ],
+    "3": [
+     [
+      "18:30",
+      "00:30"
+     ]
+    ],
+    "4": [
+     [
+      "18:30",
+      "00:30"
+     ]
+    ],
+    "5": [
+     [
+      "18:30",
+      "00:30"
+     ]
+    ],
+    "6": [
+     [
+      "18:30",
+      "00:30"
+     ]
+    ],
+    "0": [
+     [
+      "18:30",
+      "00:30"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Out of the Blue",
+   "area": "Khar",
+   "label": "Le Sutra, Union Park, Khar",
+   "ll": [
+    19.0718,
+    72.8254
+   ],
+   "status": "open",
+   "hours": {
+    "0": [
+     [
+      "07:00",
+      "01:00"
+     ]
+    ],
+    "1": [
+     [
+      "07:00",
+      "01:00"
+     ]
+    ],
+    "2": [
+     [
+      "07:00",
+      "01:00"
+     ]
+    ],
+    "3": [
+     [
+      "07:00",
+      "01:00"
+     ]
+    ],
+    "4": [
+     [
+      "07:00",
+      "01:00"
+     ]
+    ],
+    "5": [
+     [
+      "07:00",
+      "01:30"
+     ]
+    ],
+    "6": [
+     [
+      "07:00",
+      "01:30"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Doolally Taproom",
+   "area": "Versova",
+   "label": "Yari Road, Versova",
+   "ll": [
+    19.1409,
+    72.8127
+   ],
+   "status": "open",
+   "hours": {
+    "1": [
+     [
+      "10:00",
+      "01:30"
+     ]
+    ],
+    "2": [
+     [
+      "10:00",
+      "01:30"
+     ]
+    ],
+    "3": [
+     [
+      "10:00",
+      "01:30"
+     ]
+    ],
+    "4": [
+     [
+      "10:00",
+      "01:30"
+     ]
+    ],
+    "5": [
+     [
+      "10:00",
+      "01:30"
+     ]
+    ],
+    "6": [
+     [
+      "07:00",
+      "01:30"
+     ]
+    ],
+    "0": [
+     [
+      "07:00",
+      "01:30"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Pop Tate's",
+   "area": "Andheri West",
+   "label": "Versova Metro, Seven Bungalows",
+   "ll": [
+    19.1301,
+    72.8215
+   ],
+   "status": "open",
+   "hours": {
+    "0": [
+     [
+      "11:30",
+      "01:00"
+     ]
+    ],
+    "1": [
+     [
+      "11:30",
+      "01:00"
+     ]
+    ],
+    "2": [
+     [
+      "11:30",
+      "01:00"
+     ]
+    ],
+    "3": [
+     [
+      "11:30",
+      "01:00"
+     ]
+    ],
+    "4": [
+     [
+      "11:30",
+      "01:00"
+     ]
+    ],
+    "5": [
+     [
+      "11:30",
+      "01:00"
+     ]
+    ],
+    "6": [
+     [
+      "11:30",
+      "01:00"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Road House Bluez",
+   "area": "Andheri West",
+   "label": "Tokyo House, JP Road",
+   "ll": [
+    19.1274,
+    72.8361
+   ],
+   "status": "open",
+   "hours": {
+    "0": [
+     [
+      "18:00",
+      "01:00"
+     ]
+    ],
+    "1": [
+     [
+      "18:00",
+      "01:00"
+     ]
+    ],
+    "2": [
+     [
+      "18:00",
+      "01:00"
+     ]
+    ],
+    "3": [
+     [
+      "18:00",
+      "01:00"
+     ]
+    ],
+    "4": [
+     [
+      "18:00",
+      "01:00"
+     ]
+    ],
+    "5": [
+     [
+      "18:00",
+      "01:00"
+     ]
+    ],
+    "6": [
+     [
+      "18:00",
+      "01:00"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Hoppipola",
+   "area": "Khar",
+   "label": "5th Lane, Khar West",
+   "ll": [
+    19.0681,
+    72.8377
+   ],
+   "status": "unconfirmed",
+   "hours": {}
+  },
+  {
+   "brand": "Harry's Bar + Cafe",
+   "area": "Juhu",
+   "label": "Juhu Tara Road, JVPD",
+   "ll": [
+    19.1107,
+    72.8251
+   ],
+   "status": "unconfirmed",
+   "hours": {}
+  },
+  {
+   "brand": "Thirsty City 127",
+   "area": "Lower Parel",
+   "label": "Todi Mills, Mathuradas Mill Compound",
+   "ll": [
+    19.0006,
+    72.8296
+   ],
+   "status": "unconfirmed",
+   "hours": {}
+  },
+  {
+   "brand": "Bora Bora",
+   "area": "Juhu",
+   "label": "Juhu Tara Road, opp. Juhu Beach",
+   "ll": [
+    19.0981,
+    72.8271
+   ],
+   "status": "open",
+   "hours": {
+    "0": [
+     [
+      "12:00",
+      "01:30"
+     ]
+    ],
+    "1": [
+     [
+      "12:00",
+      "01:30"
+     ]
+    ],
+    "2": [
+     [
+      "12:00",
+      "01:30"
+     ]
+    ],
+    "3": [
+     [
+      "12:00",
+      "01:30"
+     ]
+    ],
+    "4": [
+     [
+      "12:00",
+      "01:30"
+     ]
+    ],
+    "5": [
+     [
+      "12:00",
+      "01:30"
+     ]
+    ],
+    "6": [
+     [
+      "12:00",
+      "01:30"
+     ]
+    ]
+   }
+  },
+  {
+   "brand": "Reunion",
+   "area": "Dadar",
+   "label": "City Light, Shivaji Park",
+   "ll": [
+    19.0287,
+    72.8416
+   ],
+   "status": "unconfirmed",
+   "hours": {}
+  }
+ ],
+ "deals": {
+  "Pop Tate's": [
+   {
+    "days": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "s": "14:47",
+    "e": "19:47",
+    "text": "1+1 on beer, 2+1 on wine",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "older",
+    "src": "LBB",
+    "note": "Chain-wide offer; some outlets may differ"
+   },
+   {
+    "untimed": true,
+    "text": "2+1 on LIITs",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "recent",
+    "src": "Google review",
+    "only": [
+     "Andheri East"
+    ]
+   }
+  ],
+  "British Brewing Company": [
+   {
+    "days": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "s": "12:00",
+    "e": "17:00",
+    "text": "2+1 on house-brewed beer (all three the same brew)",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "recent",
+    "src": "Google review, 2026",
+    "only": [
+     "Lower Parel"
+    ]
+   }
+  ],
+  "Doolally Taproom": [
+   {
+    "allDay": true,
+    "text": "Free beer tasters before you order",
+    "tags": [
+     "perk"
+    ],
+    "conf": "recent",
+    "src": "Google reviews, 2026"
+   }
+  ],
+  "The Bar Stock Exchange": [
+   {
+    "allDay": true,
+    "text": "Drink prices rise and fall with demand through the night, like a stock ticker",
+    "tags": [
+     "perk"
+    ],
+    "conf": "recent",
+    "src": "The bar's format"
+   }
+  ],
+  "Craftbar": [
+   {
+    "days": [
+     3
+    ],
+    "s": "19:00",
+    "e": "01:30",
+    "text": "Free tequila shots for women, plus live music",
+    "tags": [
+     "women"
+    ],
+    "conf": "recent",
+    "src": "Google review, 2026",
+    "approx": true
+   }
+  ],
+  "Knotty Yard Mumbai": [
+   {
+    "days": [
+     3
+    ],
+    "s": "20:00",
+    "e": "01:30",
+    "text": "Women's night: four drinks on the house",
+    "tags": [
+     "women"
+    ],
+    "conf": "recent",
+    "src": "Google review",
+    "approx": true
+   }
+  ],
+  "Road House Bluez": [
+   {
+    "days": [
+     1,
+     2,
+     3
+    ],
+    "s": "18:00",
+    "e": "00:00",
+    "text": "Extended happy hours, 6pm to midnight",
+    "tags": [
+     "late"
+    ],
+    "conf": "older",
+    "src": "LBB",
+    "only": [
+     "Andheri West"
+    ]
+   },
+   {
+    "days": [
+     4,
+     5,
+     6,
+     0
+    ],
+    "s": "18:00",
+    "e": "20:00",
+    "text": "Happy hours, 6–8pm",
+    "tags": [],
+    "conf": "older",
+    "src": "LBB",
+    "only": [
+     "Andheri West"
+    ]
+   }
+  ],
+  "Lion Heart Lounge": [
+   {
+    "days": [
+     1,
+     2,
+     3,
+     4
+    ],
+    "s": "12:00",
+    "e": "01:30",
+    "text": "Happy hours all day, Monday to Thursday",
+    "tags": [
+     "late"
+    ],
+    "conf": "older",
+    "src": "LBB"
+   }
+  ],
+  "Bora Bora": [
+   {
+    "days": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "s": "20:00",
+    "e": "01:00",
+    "text": "Casino Discount: play a game, win money off your bill",
+    "tags": [
+     "late"
+    ],
+    "conf": "older",
+    "src": "LBB",
+    "only": [
+     "Juhu"
+    ]
+   },
+   {
+    "untimed": true,
+    "text": "Daily happy hours with 1+1, 2+1 and 3+2 on drinks",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "recent",
+    "src": "Google review",
+    "only": [
+     "Andheri West"
+    ]
+   },
+   {
+    "untimed": true,
+    "text": "25% off a bucket of six beers",
+    "tags": [],
+    "conf": "recent",
+    "src": "Google review",
+    "only": [
+     "Bandra West"
+    ]
+   }
+  ],
+  "The Goose & Gridiron": [
+   {
+    "days": [
+     3
+    ],
+    "s": "19:00",
+    "e": "00:00",
+    "text": "Women's night: 1+1 on sangria and vodka drinks",
+    "tags": [
+     "women",
+     "2for1"
+    ],
+    "conf": "older",
+    "src": "Curly Tales",
+    "approx": true
+   }
+  ],
+  "The Irish House": [
+   {
+    "untimed": true,
+    "text": "1+1 happy hour (both drinks must be the same)",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "recent",
+    "src": "Google reviews, 2026"
+   }
+  ],
+  "Woodside Inn": [
+   {
+    "untimed": true,
+    "text": "1+1 on beer during happy hour",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "recent",
+    "src": "Google review",
+    "only": [
+     "Colaba"
+    ]
+   }
+  ],
+  "Hops Kitchen & Bar": [
+   {
+    "untimed": true,
+    "text": "Spirits at ₹99 per 30ml during happy hour",
+    "tags": [],
+    "conf": "recent",
+    "src": "Google review",
+    "only": [
+     "Andheri West"
+    ]
+   }
+  ],
+  "Secret Door": [
+   {
+    "untimed": true,
+    "text": "1+1 on drinks, 2+1 on pints (check the bill matches the menu)",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "recent",
+    "src": "Google reviews"
+   }
+  ],
+  "Therapy": [
+   {
+    "untimed": true,
+    "text": "Happy hour deals on drinks",
+    "tags": [],
+    "conf": "recent",
+    "src": "Google review",
+    "only": [
+     "Dadar"
+    ]
+   }
+  ],
+  "71 TALES": [
+   {
+    "untimed": true,
+    "text": "Happy hours, plus live music on weekends",
+    "tags": [],
+    "conf": "recent",
+    "src": "Google review"
+   }
+  ],
+  "Royal Oak Brewery": [
+   {
+    "untimed": true,
+    "text": "Beer tasters at ₹99",
+    "tags": [
+     "perk"
+    ],
+    "conf": "recent",
+    "src": "Google review"
+   }
+  ],
+  "Jughead's": [
+   {
+    "days": [
+     1,
+     2,
+     3,
+     4,
+     5
+    ],
+    "s": "12:00",
+    "e": "20:30",
+    "text": "1+1 on domestic spirits, 2+1 on pint beer",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "older",
+    "src": "LBB"
+   },
+   {
+    "days": [
+     0,
+     6
+    ],
+    "s": "12:00",
+    "e": "19:30",
+    "text": "1+1 on domestic spirits, 2+1 on pint beer",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "older",
+    "src": "LBB"
+   }
+  ],
+  "Hoppipola": [
+   {
+    "days": [
+     1,
+     2
+    ],
+    "s": "12:00",
+    "e": "01:00",
+    "text": "Hoppi Hours all day: drinks at ₹99, ₹199 and ₹299",
+    "tags": [],
+    "conf": "older",
+    "src": "LBB"
+   }
+  ],
+  "Reunion": [
+   {
+    "days": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "s": "12:00",
+    "e": "01:30",
+    "text": "1+1 on all drinks, noon till close",
+    "tags": [
+     "2for1",
+     "late"
+    ],
+    "conf": "older",
+    "src": "LBB"
+   }
+  ],
+  "Kalaghoda Dive": [
+   {
+    "days": [
+     1,
+     2,
+     3,
+     4
+    ],
+    "s": "12:00",
+    "e": "20:00",
+    "text": "1+1 on the whole drinks menu",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "older",
+    "src": "Curly Tales"
+   },
+   {
+    "days": [
+     5,
+     6,
+     0
+    ],
+    "s": "12:00",
+    "e": "19:00",
+    "text": "1+1 on the whole drinks menu",
+    "tags": [
+     "2for1"
+    ],
+    "conf": "older",
+    "src": "Curly Tales"
+   }
+  ],
+  "Harry's Bar + Cafe": [
+   {
+    "days": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6
+    ],
+    "s": "16:00",
+    "e": "20:00",
+    "text": "Happy hour prices on beer, spirits and cocktails",
+    "tags": [],
+    "conf": "older",
+    "src": "Curly Tales"
+   }
+  ]
+ }
+}
