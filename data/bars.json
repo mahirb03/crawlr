@@ -1,0 +1,181 @@
+{
+  "updated": "2026-10-18",
+  "areas": {
+    "Colaba": [18.915, 72.826],
+    "Fort": [18.934, 72.834],
+    "Byculla": [18.979, 72.833],
+    "Lower Parel": [18.998, 72.828],
+    "Worli": [19.010, 72.818],
+    "Dadar": [19.020, 72.842],
+    "Bandra West": [19.060, 72.835],
+    "BKC / Bandra East": [19.062, 72.860],
+    "Khar": [19.071, 72.836],
+    "Santacruz": [19.081, 72.840],
+    "Juhu": [19.100, 72.827],
+    "Andheri West": [19.134, 72.830],
+    "Versova": [19.135, 72.815],
+    "Andheri East": [19.110, 72.875],
+    "Powai": [19.118, 72.906],
+    "Chembur": [19.050, 72.900],
+    "Goregaon": [19.165, 72.849],
+    "Malad": [19.187, 72.840],
+    "Kandivali": [19.205, 72.860],
+    "Borivali": [19.230, 72.857],
+    "Mulund": [19.172, 72.956],
+    "Thane": [19.218, 72.978]
+  },
+  "bars": [
+    {
+      "id": "poptates",
+      "name": "Pop Tate's",
+      "deals": [
+        {"days": [0,1,2,3,4,5,6], "s": "14:47", "e": "19:47", "text": "1+1 on beer, 2+1 on wine", "tags": ["2for1"], "conf": "older", "src": "LBB", "note": "Chain-wide offer; some outlets may differ"}
+      ],
+      "outlets": [
+        {"area": "Andheri West", "label": "Versova Metro, Seven Bungalows", "ll": [19.1301, 72.8215], "status": "open"},
+        {"area": "Khar", "label": "5th Road, Khar West", "ll": [19.0698, 72.8381], "status": "open"},
+        {"area": "Lower Parel", "label": "Trade Tower, Kamala Mills", "ll": [19.0042, 72.8275], "status": "open"},
+        {"area": "Dadar", "label": "Kohinoor Square, Dadar West", "ll": [19.0249, 72.8411], "status": "open"},
+        {"area": "Andheri East", "label": "Sagar Palazzio, Sakinaka", "ll": [19.1035, 72.8866], "status": "open"},
+        {"area": "Andheri East", "label": "Times Square, Marol", "ll": [19.1078, 72.8841], "status": "open"},
+        {"area": "Chembur", "label": "Cubic Mall, Chembur", "ll": [19.0454, 72.9032], "status": "open"},
+        {"area": "Malad", "label": "Parth Business Plaza, Link Road", "ll": [19.1951, 72.8340], "status": "open"},
+        {"area": "Kandivali", "label": "The Hive, Kandivali East", "ll": [19.2058, 72.8677], "status": "open"},
+        {"area": "Borivali", "label": "The Castle, IC Colony", "ll": [19.2466, 72.8521], "status": "open"},
+        {"area": "Mulund", "label": "Mulund–Goregaon Link Road", "ll": [19.1617, 72.9448], "status": "open"}
+      ]
+    },
+    {
+      "id": "bbc",
+      "name": "British Brewing Company",
+      "deals": [
+        {"days": [0,1,2,3,4,5,6], "s": "12:00", "e": "17:00", "text": "2+1 on house-brewed beer (all three the same brew)", "tags": ["2for1"], "conf": "recent", "src": "Google review, 2026", "only": ["Lower Parel"]}
+      ],
+      "outlets": [
+        {"area": "Lower Parel", "label": "Mathuradas Mill Compound", "ll": [19.0007, 72.8296], "status": "open"},
+        {"area": "Andheri East", "label": "Times Square, Andheri–Kurla Road", "ll": [19.1079, 72.8838], "status": "open"},
+        {"area": "Borivali", "label": "Sky City Mall, Borivali East", "ll": [19.2225, 72.8643], "status": "open"}
+      ]
+    },
+    {
+      "id": "doolally",
+      "name": "Doolally Taproom",
+      "deals": [
+        {"days": [1,2,3,4,5], "s": "10:00", "e": "01:30", "text": "Free beer tasters before you order", "tags": ["perk"], "conf": "recent", "src": "Google reviews, 2026", "only": ["Andheri West", "Versova", "Khar"]},
+        {"days": [0,6], "s": "07:00", "e": "01:30", "text": "Free beer tasters before you order", "tags": ["perk"], "conf": "recent", "src": "Google reviews, 2026", "only": ["Andheri West", "Versova", "Khar"]},
+        {"days": [1,2,3,4,5], "s": "13:00", "e": "01:00", "text": "Free beer tasters before you order", "tags": ["perk"], "conf": "recent", "src": "Google reviews, 2026", "only": ["Thane"]},
+        {"days": [0,6], "s": "09:00", "e": "01:00", "text": "Free beer tasters before you order", "tags": ["perk"], "conf": "recent", "src": "Google reviews, 2026", "only": ["Thane"]}
+      ],
+      "outlets": [
+        {"area": "Khar", "label": "Multilink House, next to Khar station", "ll": [19.0705, 72.8396], "status": "open"},
+        {"area": "Andheri West", "label": "Oberoi Chambers, Link Road", "ll": [19.1371, 72.8328], "status": "open"},
+        {"area": "Versova", "label": "Yari Road, Versova", "ll": [19.1409, 72.8127], "status": "open"},
+        {"area": "Thane", "label": "The Walk, Hiranandani Estate", "ll": [19.2557, 72.9844], "status": "open"}
+      ]
+    },
+    {
+      "id": "craftbar",
+      "name": "Craftbar",
+      "deals": [
+        {"days": [3], "s": "19:00", "e": "01:30", "text": "Free tequila shots for women, plus live music", "tags": ["women"], "conf": "recent", "src": "Google review, 2026", "approx": true}
+      ],
+      "outlets": [
+        {"area": "BKC / Bandra East", "label": "Hallmark Business Plaza, Bandra East", "ll": [19.0606, 72.8517], "status": "open"}
+      ]
+    },
+    {
+      "id": "roadhouse",
+      "name": "Road House Bluez",
+      "deals": [
+        {"days": [1,2,3], "s": "18:00", "e": "00:00", "text": "Extended happy hours, 6pm to midnight", "tags": ["late"], "conf": "older", "src": "LBB"},
+        {"days": [4,5,6,0], "s": "18:00", "e": "20:00", "text": "Happy hours, 6–8pm", "tags": [], "conf": "older", "src": "LBB"}
+      ],
+      "outlets": [
+        {"area": "Andheri West", "label": "Tokyo House, JP Road", "ll": [19.1274, 72.8361], "status": "open"}
+      ]
+    },
+    {
+      "id": "lionheart",
+      "name": "Lion Heart Lounge",
+      "deals": [
+        {"days": [1,2,3,4], "s": "12:00", "e": "01:30", "text": "Happy hours all day, Monday to Thursday", "tags": ["late"], "conf": "older", "src": "LBB"}
+      ],
+      "outlets": [
+        {"area": "Byculla", "label": "Opp. Rani Baug, Byculla East", "ll": [18.9790, 72.8337], "status": "open"}
+      ]
+    },
+    {
+      "id": "borabora",
+      "name": "Bora Bora",
+      "deals": [
+        {"days": [0,1,2,3,4,5,6], "s": "20:00", "e": "01:00", "text": "Casino Discount: play a game, win money off your bill", "tags": ["late"], "conf": "older", "src": "LBB"}
+      ],
+      "outlets": [
+        {"area": "Juhu", "label": "Juhu Tara Road, opp. Juhu Beach", "ll": [19.0981, 72.8271], "status": "open"}
+      ]
+    },
+    {
+      "id": "goose",
+      "name": "The Goose & Gridiron",
+      "deals": [
+        {"days": [3], "s": "19:00", "e": "00:00", "text": "Women's night: 1+1 on sangria and vodka drinks", "tags": ["women", "2for1"], "conf": "older", "src": "Curly Tales", "approx": true}
+      ],
+      "outlets": [
+        {"area": "Fort", "label": "Murzban Street, opp. Sterling Cinema", "ll": [18.9381, 72.8333], "status": "open"}
+      ]
+    },
+    {
+      "id": "jugheads",
+      "name": "Jughead's",
+      "deals": [
+        {"days": [1,2,3,4,5], "s": "12:00", "e": "20:30", "text": "1+1 on domestic spirits, 2+1 on pint beer", "tags": ["2for1"], "conf": "older", "src": "LBB"},
+        {"days": [0,6], "s": "12:00", "e": "19:30", "text": "1+1 on domestic spirits, 2+1 on pint beer", "tags": ["2for1"], "conf": "older", "src": "LBB"}
+      ],
+      "outlets": [
+        {"area": "Khar", "label": "Chitrakar Dhurandhar Road, Khar West", "ll": [19.0708, 72.8388], "status": "unconfirmed"}
+      ]
+    },
+    {
+      "id": "hoppipola",
+      "name": "Hoppipola",
+      "deals": [
+        {"days": [1,2], "s": "12:00", "e": "01:00", "text": "Hoppi Hours all day: drinks at ₹99, ₹199 and ₹299", "tags": [], "conf": "older", "src": "LBB"}
+      ],
+      "outlets": [
+        {"area": "Khar", "label": "5th Lane, Khar West", "ll": [19.0681, 72.8377], "status": "unconfirmed"},
+        {"area": "Powai", "label": "Galleria, Hiranandani Gardens", "ll": [19.1190, 72.9112], "status": "unconfirmed"}
+      ]
+    },
+    {
+      "id": "reunion",
+      "name": "Reunion",
+      "deals": [
+        {"days": [0,1,2,3,4,5,6], "s": "12:00", "e": "01:30", "text": "1+1 on all drinks, noon till close", "tags": ["2for1", "late"], "conf": "older", "src": "LBB"}
+      ],
+      "outlets": [
+        {"area": "Dadar", "label": "Shivaji Park, Dadar", "ll": [19.0287, 72.8416], "status": "unconfirmed"}
+      ]
+    },
+    {
+      "id": "kgdive",
+      "name": "Kalaghoda Dive",
+      "deals": [
+        {"days": [1,2,3,4], "s": "12:00", "e": "20:00", "text": "1+1 on the whole drinks menu", "tags": ["2for1"], "conf": "older", "src": "Curly Tales"},
+        {"days": [5,6,0], "s": "12:00", "e": "19:00", "text": "1+1 on the whole drinks menu", "tags": ["2for1"], "conf": "older", "src": "Curly Tales"}
+      ],
+      "outlets": [
+        {"area": "Fort", "label": "Mumbai Samachar Marg, Kala Ghoda", "ll": [18.9287, 72.8340], "status": "unconfirmed"}
+      ]
+    },
+    {
+      "id": "harrys",
+      "name": "Harry's Bar + Cafe",
+      "deals": [
+        {"days": [0,1,2,3,4,5,6], "s": "16:00", "e": "20:00", "text": "Happy hour prices on beer, spirits and cocktails", "tags": [], "conf": "older", "src": "Curly Tales"}
+      ],
+      "outlets": [
+        {"area": "Juhu", "label": "Juhu Tara Road, JVPD", "ll": [19.1107, 72.8251], "status": "unconfirmed"}
+      ]
+    }
+  ]
+}

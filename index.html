@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Crawlr</title>
+<meta name="description" content="Bar deals across Mumbai, sorted by what's on right now and how close it is, with a bar-hop planner.">
+<meta name="theme-color" content="#F4F5F2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121413" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232F5D50'/%3E%3Cpath d='M10 8h12l-2 16h-8z' fill='%23F4F5F2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 class="mark">crawl<span>r</span></h1>
+  </header>
+  <p class="lede">Happy hours and bar deals across Mumbai. See what's on now, then plan a bar hop.</p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tabDeals" aria-selected="true" aria-controls="deals">Deals</button>
+    <button class="tab" role="tab" id="tabCrawl" aria-selected="false" aria-controls="crawl">Crawl<span class="count" id="crawlCount"></span></button>
+  </div>
+
+  <div class="when">
+    <span class="field"><label for="day">Day</label><select id="day"></select></span>
+    <span class="field"><label for="time">Time</label><input id="time" type="time" step="900"></span>
+    <span class="field"><label for="area">Near</label><select id="area"></select></span>
+    <button class="linkbtn" id="nowBtn" type="button" hidden>Back to now</button>
+  </div>
+
+  <section id="deals" role="tabpanel" aria-labelledby="tabDeals">
+    <div class="filters" role="group" aria-label="Filter deals">
+      <button class="chip" type="button" data-f="all" aria-pressed="true">All</button>
+      <button class="chip" type="button" data-f="2for1">1+1 and 2+1</button>
+      <button class="chip" type="button" data-f="late">Late</button>
+      <button class="chip" type="button" data-f="women">Women's nights</button>
+    </div>
+    <p class="summary" id="summary">Loading deals…</p>
+    <div id="list"></div>
+  </section>
+
+  <section id="crawl" role="tabpanel" aria-labelledby="tabCrawl" hidden>
+    <div class="plan">
+      <h2>Plan a crawl</h2>
+      <p>Starts from the area and time above and picks the nearest bar with a deal running when you arrive.</p>
+      <div class="fields">
+        <span class="field"><label for="stops">Stops</label><select id="stops"><option>2</option><option selected>3</option><option>4</option><option>5</option></select></span>
+        <span class="field"><label for="stay">At each</label><select id="stay"><option value="45">45 min</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option></select></span>
+      </div>
+      <label class="check"><input type="checkbox" id="incUnconf"> Include bars I couldn't confirm are open</label>
+      <button class="go" type="button" id="planBtn">Plan my crawl</button>
+    </div>
+    <div id="crawlOut"></div>
+  </section>
+
+  <footer class="fine">
+    <p>Deals come from published guides and recent Google reviews, and bars change offers often. Check the bar's Instagram or call before you go. Times are IST.</p>
+    <p>Legal drinking age in Maharashtra is 25 for spirits. Don't drink and drive; cab between stops.</p>
+    <p id="updated"></p>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
