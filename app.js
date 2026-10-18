@@ -188,7 +188,7 @@
     return `<article class="card">
       <div class="tile">${ico(drinkIcon(d))}</div>
       <div><div class="name">${esc(b.name)}</div>${sub(o, dist)}</div>
-      <span class="pill quiet">${ico("clock")}?</span>
+      <span class="pill quiet">Ask</span>
       <div class="deal">${esc(d.text)}</div>
       <div class="acts">${addBtn(b, oi)}${b.outlets.length > 1 ? "" : mapBtn(b, o)}${srcFlag(d)}</div>
       ${outletsBlock(b)}

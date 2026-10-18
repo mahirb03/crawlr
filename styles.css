@@ -11,6 +11,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;
   background-image:radial-gradient(120% 60% at 50% -10%,rgba(227,164,74,.10),transparent 60%);background-attachment:fixed;
