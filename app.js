@@ -125,77 +125,84 @@
     return { timed, untimed, open };
   }
 
+  // ---- icons ----
+  const ico = (id, cls = "i") => `<svg class="${cls}" aria-hidden="true"><use href="#i-${id}"/></svg>`;
+  function drinkIcon(d) {
+    const t = d ? (d.text || "").toLowerCase() : "";
+    if (/tequila|shot/.test(t)) return "shot";
+    if (/wine|sangria/.test(t)) return "wine";
+    if (/cocktail|liit|martini/.test(t)) return "cocktail";
+    if (/beer|pint|brew|taster|bucket|pitcher/.test(t)) return "beer";
+    if (d && (d.tags || []).includes("2for1")) return "cheers";
+    if (d && (d.tags || []).includes("perk")) return "spark";
+    return "glasses";
+  }
+
   function renderDeals() {
     const { timed, untimed, open } = collect();
     const on = timed.filter((r) => r.s.k === "on"), later = timed.filter((r) => r.s.k === "later"), done = timed.filter((r) => r.s.k === "done");
-    const total = DATA.bars.reduce((n, b) => n + b.outlets.length, 0);
-    $("summary").textContent = `${on.length} deals on at ${fmt(clock(st.t))}, ${DAYS_LONG[st.day]}${later.length ? `, ${later.length} starting later` : ""}. Nearest to ${st.area} first. ${DATA.bars.length} bars, ${total} outlets in the list.`;
-    const sect = (title, list, fn, extra = "") => list.length ? `<div class="group">${title}</div>${extra}` + list.map(fn).join("") : "";
+    $("summary").innerHTML = `<span><span class="dot"></span><b>${on.length}</b> on now</span>` +
+      (later.length ? `<span><b>${later.length}</b> later</span>` : "") +
+      (st.f === "all" ? `<span><b>${open.length}</b> other bars open</span>` : "");
+    const sect = (title, list, fn) => list.length ? `<div class="group">${title}<span class="n">${list.length}</span></div><div class="list">${list.map(fn).join("")}</div>` : "";
     const showOpen = st.f === "all";
+    const shownOpen = open.slice(0, st.moreOpen);
     $("list").innerHTML =
-      sect("On now", on, row) + sect("Later tonight", later, row) +
-      sect("Happy hour reported, times not listed", untimed, rowU, `<p class="hint">These bars run a deal, but the times weren't published. Call or check Instagram.</p>`) +
-      sect("Finished for today", done, row) +
-      (showOpen ? sect(`Other bars open now`, open.slice(0, st.moreOpen), rowOpen) +
-        (open.length > st.moreOpen ? `<button class="linkbtn more" type="button" id="moreOpen">Show ${Math.min(20, open.length - st.moreOpen)} more of ${open.length - st.moreOpen}</button>` : "") : "") ||
-      `<p class="empty">Nothing ${st.f === "all" ? "" : "of this kind "}on ${DAYS_LONG[st.day]}. Try another day or filter.</p>`;
+      (sect("On now", on, card) + sect("Later", later, card) +
+      sect("Times not listed", untimed, cardU) +
+      sect("Done for today", done, card) +
+      (showOpen ? sect("Also open", shownOpen, rowOpen) +
+        (open.length > st.moreOpen ? `<button class="more" type="button" id="moreOpen">Show more</button>` : "") : "")) ||
+      `<div class="empty">${ico("glasses")}Nothing here on ${DAYS_LONG[st.day]}.</div>`;
   }
 
   const pct = (m) => (m / 1440 * 100).toFixed(2) + "%";
-  const addBtn = (b, oi) => `<button class="add" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="${inCrawl(b.id)}">${inCrawl(b.id) ? "In crawl" : "+ Add to crawl"}</button>`;
+  const addBtn = (b, oi) => inCrawl(b.id)
+    ? `<button class="btn" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="true">${ico("check")}In crawl</button>`
+    : `<button class="btn" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="false">${ico("plus")}Crawl</button>`;
+  const mapBtn = (b, o) => `<a class="btn icon" href="${mapsUrl(b, o)}" target="_blank" rel="noopener" title="Open in Maps" aria-label="Open ${esc(b.name)} in Maps">${ico("map")}</a>`;
+  const srcFlag = (d) => `<span class="flag src" title="${d.conf === "recent" ? "Seen recently" : "Older report"}: ${esc(d.src)}${d.note ? ". " + esc(d.note) : ""}">${ico("info")}${d.conf === "recent" ? "Recent" : "Older"}</span>`;
+  const warnFlag = (o) => o.status !== "open" ? `<span class="flag warn" title="Opening hours aren't listed on Google">${ico("warn")}Call first</span>` : "";
+  const sub = (o, dist) => `<div class="sub">${ico("pin")}${esc(o.area)} · ${kmLabel(dist)}</div>`;
   function outletsBlock(b) {
     if (b.outlets.length < 2) return "";
-    return `<details><summary>${b.outlets.length} outlets</summary><ul class="outlets">${
-      b.outlets.map((x, i) => ({ x, i, d: km(here(), x.ll) })).sort((p, q) => p.d - q.d)
-        .map(({ x, d }) => `<li><span>${esc(x.area)} · ${esc(x.label)}${x.status !== "open" ? " · unconfirmed" : ""}${dealsFor(b, x).length ? "" : " · no deal listed"}</span><span>${kmLabel(d)} · <a href="${mapsUrl(b, x)}" target="_blank" rel="noopener">Map</a></span></li>`).join("")
+    return `<details class="outs"><summary>${ico("store")}${b.outlets.length} outlets</summary><ul>${
+      b.outlets.map((x) => ({ x, d: km(here(), x.ll) })).sort((p, q) => p.d - q.d)
+        .map(({ x, d }) => `<li><span>${esc(x.area)} · ${esc(x.label)}</span><span class="r">${x.status !== "open" ? ico("warn") : ""}${kmLabel(d)}<a href="${mapsUrl(b, x)}" target="_blank" rel="noopener" aria-label="Map">${ico("map")}</a></span></li>`).join("")
     }</ul></details>`;
   }
-  function row({ b, o, oi, d, s, dist }) {
-    const lab = s.k === "on" ? `On · ${dur(s.left)} left` : s.k === "later" ? `Starts in ${dur(s.inn)}` : "Over";
-    return `<article class="row ${s.k === "done" ? "past" : ""}">
-      <div>
-        <div class="name">${esc(b.name)}</div>
-        <div class="where">${esc(o.area)} · ${esc(o.label)} · ${kmLabel(dist)}</div>
-        <div class="deal">${esc(d.text)}</div>
-        <div class="meta">${dealTime(d)}</div>
-      </div>
-      <div class="status ${s.k}">${lab}</div>
+  function card({ b, o, oi, d, s, dist }) {
+    const lab = s.k === "on" ? `${dur(s.left)} left` : s.k === "later" ? `in ${dur(s.inn)}` : "Over";
+    return `<article class="card ${s.k === "on" ? "on" : s.k === "done" ? "past" : ""}">
+      <div class="tile">${ico(drinkIcon(d))}</div>
+      <div><div class="name">${esc(b.name)}</div>${sub(o, dist)}</div>
+      <span class="pill ${s.k}">${lab}</span>
+      <div class="deal">${esc(d.text)}</div>
+      <div class="meta">${ico("clock")}${dealTime(d)}</div>
       <div class="bar" aria-hidden="true"><i style="left:${pct(s.s)};width:${pct(s.e - s.s)}"></i><b style="left:${pct(st.t)}"></b></div>
-      <div class="foot">
-        ${addBtn(b, oi)}
-        ${b.outlets.length > 1 ? "" : `<a href="${mapsUrl(b, o)}" target="_blank" rel="noopener">Map</a>`}
-        <span>${d.conf === "recent" ? "Seen recently" : "Older report"} · ${esc(d.src)}</span>
-        ${o.status !== "open" ? `<span class="warn">Hours not listed on Google, call first</span>` : ""}
-        ${d.note ? `<span>${esc(d.note)}</span>` : ""}
-      </div>
+      <div class="acts">${addBtn(b, oi)}${b.outlets.length > 1 ? "" : mapBtn(b, o)}${srcFlag(d)}${warnFlag(o)}</div>
       ${outletsBlock(b)}
     </article>`;
   }
-  function rowU({ b, o, oi, d, dist }) {
-    return `<article class="row">
-      <div>
-        <div class="name">${esc(b.name)}</div>
-        <div class="where">${esc(o.area)} · ${esc(o.label)} · ${kmLabel(dist)}</div>
-        <div class="deal">${esc(d.text)}</div>
-      </div>
-      <div class="status later">Times not listed</div>
-      <div class="foot">
-        ${addBtn(b, oi)}
-        ${b.outlets.length > 1 ? "" : `<a href="${mapsUrl(b, o)}" target="_blank" rel="noopener">Map</a>`}
-        <span>Seen recently · ${esc(d.src)}</span>
-      </div>
+  function cardU({ b, o, oi, d, dist }) {
+    return `<article class="card">
+      <div class="tile">${ico(drinkIcon(d))}</div>
+      <div><div class="name">${esc(b.name)}</div>${sub(o, dist)}</div>
+      <span class="pill quiet">${ico("clock")}?</span>
+      <div class="deal">${esc(d.text)}</div>
+      <div class="acts">${addBtn(b, oi)}${b.outlets.length > 1 ? "" : mapBtn(b, o)}${srcFlag(d)}</div>
       ${outletsBlock(b)}
     </article>`;
   }
   function rowOpen({ b, o, oi, s, dist }) {
-    return `<article class="row compact">
-      <div>
-        <div class="name">${esc(b.name)}</div>
-        <div class="where">${esc(o.area)} · ${esc(o.label)} · ${kmLabel(dist)}</div>
-      </div>
-      <div class="status done">Open till ${fmt(clock(s.e % 1440))}</div>
-      <div class="foot">${addBtn(b, oi)}<a href="${mapsUrl(b, o)}" target="_blank" rel="noopener">Map</a><span>No deal listed</span></div>
-    </article>`;
+    return `<div class="mini">
+      <div class="tile">${ico("glasses")}</div>
+      <div><div class="name">${esc(b.name)}</div>${sub(o, dist)}</div>
+      <span class="till">till ${fmt(clock(s.e % 1440))}</span>
+      ${inCrawl(b.id)
+        ? `<button class="btn icon" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="true" aria-label="Remove from crawl">${ico("check")}</button>`
+        : `<button class="btn icon" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="false" aria-label="Add to crawl">${ico("plus")}</button>`}
+    </div>`;
   }
 
   // ---- crawl ----
@@ -261,8 +268,8 @@
     const out = $("crawlOut");
     if (!stops.length) {
       out.innerHTML = auto
-        ? `<p class="note">Couldn't find a bar with a deal near ${esc(st.area)} around ${fmt(clock(st.t))} on ${DAYS_LONG[st.day]}. Try an earlier time, another day, or tick “fill gaps”.</p>`
-        : `<p class="note">Your crawl is empty. Plan one above, or tap “Add to crawl” on any bar.</p>`;
+        ? `<div class="empty">${ico("moon")}No deals near ${esc(st.area)} around ${fmt(clock(st.t))}. Try earlier, or switch on Fill gaps.</div>`
+        : `<div class="empty">${ico("route")}Plan a crawl, or tap Crawl on any bar.</div>`;
       return;
     }
     const stay = +$("stay").value;
@@ -274,20 +281,21 @@
       const ds = s.d ? dealStatus(s.d, s.o, st.day, s.start) : null;
       const h = hoursOn(s.o, st.day);
       const closed = h && !h.some(([a, e]) => s.start >= a && s.start < e);
-      const warn = closed ? "Closed when you'd arrive" : s.d && !s.d.untimed && !s.d.allDay && (!ds || ds.k === "done") ? "Deal is over by the time you arrive" : "";
-      const dealLine = !s.d ? `<div class="meta">No deal listed</div>` : s.d.untimed ? `<div class="meta">Deal times not listed</div>` : `<div class="meta">${dealTime(s.d)}</div>`;
+      const warn = closed ? "Closed by then" : s.d && !s.d.untimed && !s.d.allDay && (!ds || ds.k === "done") ? "Deal over by then" : "";
       return `<li class="stop">
-        <div><div class="name">${esc(s.b.name)}</div>
-          <div class="where">${esc(s.o.area)} · ${esc(s.o.label)}</div>
-          ${s.d ? `<div class="deal">${esc(s.d.text)}</div>` : ""}
-          ${warn ? `<div class="meta warn">${warn}</div>` : dealLine}
-          ${s.o.status !== "open" ? `<div class="meta warn">Hours not listed on Google, call first</div>` : ""}
-        </div>
-        <div class="right"><div class="time">${fmt(clock(s.start))}</div><button class="rm" type="button" data-rm="${s.b.id}">Remove</button></div>
-        <div class="hop">${i === 0 ? "from " + esc(st.area) : "then"} · ${kmLabel(s.dist)} · ~${s.travel} min by cab</div>
+        <div class="hop">${ico("car")}${s.travel ? `${s.travel} min · ${kmLabel(s.dist)}` : "Start here"}</div>
+        <div class="when">${fmt(clock(s.start))}</div>
+        <article class="card ${s.d ? "on" : ""}" data-n="${i + 1}">
+          <div class="tile">${ico(drinkIcon(s.d))}</div>
+          <div><div class="name">${esc(s.b.name)}</div>${sub(s.o, s.dist)}</div>
+          <button class="btn icon" type="button" data-rm="${s.b.id}" aria-label="Remove ${esc(s.b.name)}">${ico("x")}</button>
+          <div class="deal">${s.d ? esc(s.d.text) : `<span class="flag">No deal listed</span>`}</div>
+          ${warn ? `<div class="meta flag warn">${ico("warn")}${warn}</div>` : s.d && !s.d.untimed ? `<div class="meta">${ico("clock")}${dealTime(s.d)}</div>` : ""}
+          ${s.o.status !== "open" ? `<div class="meta flag warn">${ico("warn")}Call first</div>` : ""}
+        </article>
       </li>`; }).join("")}</ol>
-      <p class="note">${stops.length} stops, ${fmt(clock(stops[0].start))} to about ${fmt(clock(end))}. Cab times are rough estimates.</p>
-      <a class="route" href="${route}" target="_blank" rel="noopener">Open the route in Google Maps ↗</a>`;
+      <p class="note">${ico("clock")}${fmt(clock(stops[0].start))} – ${fmt(clock(end))} · ${stops.length} stops</p>
+      <a class="route" href="${route}" target="_blank" rel="noopener">${ico("map")}Open route in Maps</a>`;
   }
 
   function showCrawl(auto) {
