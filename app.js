@@ -130,9 +130,9 @@
   function drinkIcon(d) {
     const t = d ? (d.text || "").toLowerCase() : "";
     if (/tequila|shot/.test(t)) return "shot";
+    if (/beer|pint|brew|taster|bucket|pitcher/.test(t)) return "beer";
     if (/wine|sangria/.test(t)) return "wine";
     if (/cocktail|liit|martini/.test(t)) return "cocktail";
-    if (/beer|pint|brew|taster|bucket|pitcher/.test(t)) return "beer";
     if (d && (d.tags || []).includes("2for1")) return "cheers";
     if (d && (d.tags || []).includes("perk")) return "spark";
     return "glasses";
