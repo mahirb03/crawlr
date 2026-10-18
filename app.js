@@ -159,7 +159,7 @@
   const pct = (m) => (m / 1440 * 100).toFixed(2) + "%";
   const addBtn = (b, oi) => inCrawl(b.id)
     ? `<button class="btn" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="true">${ico("check")}In crawl</button>`
-    : `<button class="btn" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="false">${ico("plus")}Crawl</button>`;
+    : `<button class="btn fill" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="false">${ico("plus")}Crawl</button>`;
   const mapBtn = (b, o) => `<a class="btn icon" href="${mapsUrl(b, o)}" target="_blank" rel="noopener" title="Open in Maps" aria-label="Open ${esc(b.name)} in Maps">${ico("map")}</a>`;
   const srcFlag = (d) => `<span class="flag src" title="${d.conf === "recent" ? "Seen recently" : "Older report"}: ${esc(d.src)}${d.note ? ". " + esc(d.note) : ""}">${ico("info")}${d.conf === "recent" ? "Recent" : "Older"}</span>`;
   const warnFlag = (o) => o.status !== "open" ? `<span class="flag warn" title="Opening hours aren't listed on Google">${ico("warn")}Call first</span>` : "";
@@ -308,6 +308,22 @@
     } else renderCrawl(layoutManual(stay), false);
   }
 
+  // ---- area tiles: every area, busiest first, each with its own warm gradient ----
+  const GRADS = [["#7A3E12","#E39B3B"],["#5B1F2A","#C2525E"],["#2F3B1A","#A3A13C"],["#4A2A12","#C7773A"],["#3B1F3F","#B0587E"],["#1F3138","#3E8C8C"],["#3D2B13","#D8B25A"],["#4B1714","#D4633C"]];
+  const AREA_ICONS = ["beer", "wine", "cocktail", "cheers", "shot", "glasses"];
+  function renderAreas() {
+    const counts = {};
+    for (const b of DATA.bars) for (const o of b.outlets) counts[o.area] = (counts[o.area] || 0) + 1;
+    const names = Object.keys(DATA.areas).filter((a) => counts[a]).sort((a, b) => (a === st.area ? -1 : b === st.area ? 1 : counts[b] - counts[a]));
+    $("areas").innerHTML = names.map((a, i) => {
+      let h = 0; for (const c of a) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+      const [g1, g2] = GRADS[h % GRADS.length];
+      return `<button class="area" type="button" role="radio" data-area="${esc(a)}" aria-checked="${a === st.area}" style="--g:linear-gradient(135deg,${g1},${g2})">
+        ${ico(AREA_ICONS[h % AREA_ICONS.length])}<b>${esc(a)}</b><small>${counts[a]} bars</small></button>`;
+    }).join("");
+    $("areas").scrollLeft = 0;
+  }
+
   // ---- controls ----
   function render() {
     sync();
@@ -324,13 +340,15 @@
 
   function wire() {
     $("day").innerHTML = [1, 2, 3, 4, 5, 6, 0].map((d) => `<option value="${d}">${DAYS_LONG[d]}</option>`).join("");
-    $("area").innerHTML = Object.keys(DATA.areas).map((a) => `<option>${esc(a)}</option>`).join("");
     if (!DATA.areas[st.area]) st.area = "Bandra West";
-    $("area").value = st.area;
+    renderAreas();
     $("day").addEventListener("change", (e) => { st.live = false; st.day = +e.target.value; render(); });
     $("time").addEventListener("change", (e) => { if (!e.target.value) return; st.live = false; st.t = bd(toMin(e.target.value)); render(); });
     $("nowBtn").addEventListener("click", () => { st.live = true; render(); });
-    $("area").addEventListener("change", (e) => { st.area = e.target.value; store.set("crawlr.area", st.area); st.moreOpen = 12; render(); });
+    $("areas").addEventListener("click", (e) => {
+      const t = e.target.closest("[data-area]"); if (!t) return;
+      st.area = t.dataset.area; store.set("crawlr.area", st.area); st.moreOpen = 12; renderAreas(); render();
+    });
     document.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => { st.f = b.dataset.f; store.set("crawlr.filter", st.f); render(); }));
     $("tabDeals").addEventListener("click", () => { st.tab = "deals"; render(); });
     $("tabCrawl").addEventListener("click", () => { st.tab = "crawl"; render(); });
