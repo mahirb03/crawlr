@@ -190,3 +190,5 @@ details.outs li a{color:var(--amber);display:inline-flex}
 .more.wide .i{width:15px;height:15px}
 details.outs li.here span:first-child{color:var(--amber)}
 .areas{padding-top:4px}
+.mini .till{display:inline-flex;align-items:center;gap:4px}
+.mini .till .i{width:13px;height:13px}

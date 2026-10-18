@@ -85,7 +85,11 @@
     if (st.area === "My location") return km(here(), o.ll) <= Math.max(2, extraKm);
     return o.area === st.area || (extraKm > 0 && km(here(), o.ll) <= extraKm);
   }
-  const passes = (d) => st.f === "all" || (d.tags || []).includes(st.f);
+  // Closing time tonight from Google hours (bar-day minutes), or null when unknown.
+  function closesAt(o, day) { const h = hoursOn(o, day); return h && h.length ? Math.max(...h.map((r) => r[1])) : null; }
+  const LATE = 1140;                                                   // 1:00am in bar-day minutes
+  const lateOutlet = (o) => (closesAt(o, st.day) || 0) >= LATE;
+  const passes = (d, o) => st.f === "all" || (st.f === "late" ? (o ? lateOutlet(o) : false) || (d.tags || []).includes("late") : (d.tags || []).includes(st.f));
   const inCrawl = (id) => st.crawl.some((c) => c.bar === id);
 
   // ---- deals view ----
@@ -97,7 +101,7 @@
         if (!inArea(o, st.wide ? 3 : 0)) return;
         const dist = km(here(), o.ll);
         for (const d of dealsFor(b, o)) {
-          if (!passes(d)) continue;
+          if (!passes(d, o)) continue;
           if (d.untimed) {
             const h = hoursOn(o, st.day);
             if (h && !h.length) continue;
@@ -121,6 +125,7 @@
       b.outlets.forEach((o, oi) => {
         if (!inArea(o, st.wide ? 3 : 0)) return;
         const h = hoursOn(o, st.day); if (!h) return;
+        if (st.f === "late" && !lateOutlet(o)) return;
         const s = windowStatus(h, st.t); if (!s || s.k !== "on") return;
         const dist = km(here(), o.ll);
         if (!best || dist < best.dist) best = { b, o, oi, s, dist };
@@ -154,7 +159,7 @@
       (later.length ? `<span><b>${later.length}</b> later</span>` : "") +
       (st.f === "all" ? `<span><b>${open.length}</b> other bars open</span>` : "");
     const sect = (title, list, fn) => list.length ? `<div class="group">${title}<span class="n">${list.length}</span></div><div class="list">${list.map(fn).join("")}</div>` : "";
-    const showOpen = st.f === "all";
+    const showOpen = st.f === "all" || st.f === "late";
     const shownOpen = open.slice(0, st.moreOpen);
     $("list").innerHTML =
       (sect("On now", on, card) + sect("Later", later, card) +
@@ -173,7 +178,7 @@
   const mapBtn = (b, o) => `<a class="btn icon" href="${mapsUrl(b, o)}" target="_blank" rel="noopener" title="Open in Maps" aria-label="Open ${esc(b.name)} in Maps">${ico("map")}</a>`;
   const srcFlag = (d) => `<span class="flag src" title="${d.conf === "recent" ? "Seen recently" : "Older report"}: ${esc(d.src)}${d.note ? ". " + esc(d.note) : ""}">${ico("info")}${d.conf === "recent" ? "Recent" : "Older"}</span>`;
   const warnFlag = (o) => o.status !== "open" ? `<span class="flag warn" title="Opening hours aren't listed on Google">${ico("warn")}Call first</span>` : "";
-  const sub = (o, dist) => `<div class="sub">${ico("pin")}${esc(o.area)} · ${kmLabel(dist)}</div>`;
+  const sub = (o, dist) => { const c = closesAt(o, st.day); return `<div class="sub">${ico("pin")}${esc(o.area)} · ${kmLabel(dist)}${c ? ` · open till ${fmt(clock(c % 1440))}` : ""}</div>`; };
   function outletsBlock(b) {
     if (b.outlets.length < 2) return "";
     return `<details class="outs"><summary>${ico("store")}${b.outlets.length} outlets</summary><ul>${
@@ -208,7 +213,7 @@
     return `<div class="mini">
       <div class="tile">${ico("glasses")}</div>
       <div><div class="name">${esc(b.name)}</div>${sub(o, dist)}</div>
-      <span class="till">till ${fmt(clock(s.e % 1440))}</span>
+      <span class="till">${ico("moon")}${fmt(clock(s.e % 1440))}</span>
       ${inCrawl(b.id)
         ? `<button class="btn icon" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="true" aria-label="Remove from crawl">${ico("check")}</button>`
         : `<button class="btn icon" type="button" data-add="${b.id}" data-o="${oi}" aria-pressed="false" aria-label="Add to crawl">${ico("plus")}</button>`}
@@ -250,7 +255,7 @@
           const pinBonus = isPinned ? -20 : 0;
           let had = false;
           for (const d of dealsFor(b, o)) {
-            if (!passes(d) && !isPinned) continue;
+            if (!passes(d, o) && !isPinned) continue;
             if (d.untimed) {
               if (!openAt(arrive)) continue;
               had = true;

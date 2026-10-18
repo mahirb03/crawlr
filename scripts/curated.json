@@ -1,9 +1,8 @@
 {
- "updated": "2026-10-18",
+ "updated": "2026-10-19",
  "keep_unconfirmed": [
   "Jughead's",
   "Hoppipola",
-  "Reunion",
   "Kalaghoda Dive",
   "Harry's Bar + Cafe",
   "Thirsty City 127"
@@ -517,17 +516,6 @@
      ]
     ]
    }
-  },
-  {
-   "brand": "Reunion",
-   "area": "Dadar",
-   "label": "City Light, Shivaji Park",
-   "ll": [
-    19.0287,
-    72.8416
-   ],
-   "status": "unconfirmed",
-   "hours": {}
   }
  ],
  "deals": {
@@ -884,28 +872,6 @@
     "e": "01:00",
     "text": "Hoppi Hours all day: drinks at ₹99, ₹199 and ₹299",
     "tags": [],
-    "conf": "older",
-    "src": "LBB"
-   }
-  ],
-  "Reunion": [
-   {
-    "days": [
-     0,
-     1,
-     2,
-     3,
-     4,
-     5,
-     6
-    ],
-    "s": "12:00",
-    "e": "01:30",
-    "text": "1+1 on all drinks, noon till close",
-    "tags": [
-     "2for1",
-     "late"
-    ],
     "conf": "older",
     "src": "LBB"
    }
