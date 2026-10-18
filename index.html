@@ -42,11 +42,13 @@
       <div class="planrow">
         <label class="sel" title="Stops"><svg class="i"><use href="#i-route"/></svg><select id="stops" aria-label="Stops"><option value="2">2 stops</option><option value="3" selected>3 stops</option><option value="4">4 stops</option><option value="5">5 stops</option></select></label>
         <label class="sel" title="Time at each bar"><svg class="i"><use href="#i-clock"/></svg><select id="stay" aria-label="Time at each bar"><option value="45">45 min each</option><option value="60" selected>1 hr each</option><option value="90">1.5 hr each</option></select></label>
+        <label class="sel" title="How far from your area"><svg class="i"><use href="#i-pin"/></svg><select id="radius" aria-label="How far from your area"><option value="1.5">Within 1.5 km</option><option value="3" selected>Within 3 km</option><option value="6">Within 6 km</option></select></label>
       </div>
       <div class="planrow">
         <label class="toggle" title="When no deal is running, stop at a nearby open bar"><input type="checkbox" id="fill" checked><span></span>Fill gaps</label>
         <label class="toggle" title="Include bars whose hours aren't listed on Google"><input type="checkbox" id="incUnconf"><span></span>Unverified bars</label>
       </div>
+      <p class="planhint" id="planHint"></p>
       <button class="go" type="button" id="planBtn"><svg class="i"><use href="#i-route"/></svg>Plan my crawl</button>
     </div>
     <div id="crawlOut"></div>
@@ -79,6 +81,7 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
     <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4L3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></symbol>
+    <symbol id="i-walk" viewBox="0 0 24 24"><circle cx="13" cy="4.5" r="1.8"/><path d="M10 21l2-6 3 3v3"/><path d="M12 15l-1-5 3-2 2 3 3 1"/><path d="M11 10l-3 2-1 3"/></symbol>
     <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 16v-4l2-5h10l2 5v4"/><rect x="3" y="12" width="18" height="5" rx="1.5"/><circle cx="7.5" cy="18.5" r="1.5"/><circle cx="16.5" cy="18.5" r="1.5"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.8v.2"/></symbol>
     <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5M12 17.2v.2"/></symbol>

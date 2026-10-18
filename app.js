@@ -206,34 +206,58 @@
   }
 
   // ---- crawl ----
+  // Plan a crawl around the chosen area.
+  // - Bars you've already added are always kept (they're "pinned").
+  // - Only bars within opts.radius km of the area centre are considered, so the night stays in one neighbourhood.
+  // - At each step it picks the best next stop by: travel time + waiting for a deal to start + distance from the
+  //   area centre, with small penalties for weaker options (a perk, a deal with no published times, or no deal).
+  const walkMin = (d) => Math.round((d * 1.3) / 4.5 * 60);          // ~4.5 km/h, streets ~1.3× straight line
+  const hop = (d) => d <= 0.9 ? { mins: walkMin(d), walk: true } : { mins: cabMin(d), walk: false };
   function planCrawl(n, stay, opts) {
-    let pos = DATA.areas[st.area], t = st.t;
+    const centre = DATA.areas[st.area];
+    const pinned = new Map((opts.keep || []).map((c) => [c.bar, c.outlet]));
+    n = Math.max(n, pinned.size);
+    let pos = centre, t = st.t;
     const used = new Set(), stops = [];
     for (let i = 0; i < n; i++) {
       let best = null;
+      const consider = (c) => { if (!best || c.score < best.score) best = c; };
+      const pinsLeft = [...pinned.keys()].filter((id) => !used.has(id)).length;
+      const mustPin = n - i <= pinsLeft;                              // remaining slots are only enough for your picks
       for (const b of DATA.bars) {
         if (used.has(b.id)) continue;
+        const isPinned = pinned.has(b.id);
+        if (mustPin && !isPinned) continue;
         b.outlets.forEach((o, oi) => {
-          if (o.status !== "open" && !opts.unconfirmed) return;
-          const dist = km(pos, o.ll), travel = i === 0 && dist < 0.5 ? 0 : cabMin(dist), arrive = t + travel;
-          if (travel > 35) return;                                     // keep hops short
+          if (isPinned && pinned.get(b.id) !== oi) return;
+          const fromCentre = km(centre, o.ll);
+          if (!isPinned && fromCentre > opts.radius) return;
+          if (!isPinned && o.status !== "open" && !opts.unconfirmed) return;
+          const dist = km(pos, o.ll), h1 = i === 0 && dist < 0.3 ? { mins: 0, walk: true } : hop(dist), arrive = t + h1.mins;
           const h = hoursOn(o, st.day);
           const openAt = (m) => !h || h.some(([s, e]) => m >= s && m < e);
+          const base = { b, o, oi, dist, travel: h1.mins, walk: h1.walk, arrive, pinned: isPinned };
+          const pinBonus = isPinned ? -20 : 0;
           let had = false;
           for (const d of dealsFor(b, o)) {
-            if (d.untimed) continue;
+            if (!passes(d) && !isPinned) continue;
+            if (d.untimed) {
+              if (!openAt(arrive)) continue;
+              had = true;
+              consider({ ...base, d, start: arrive, score: h1.mins + 1.5 * fromCentre + 8 + pinBonus });
+              continue;
+            }
             const s = dealStatus(d, o, st.day, arrive); if (!s || s.k === "done") continue;
             const wait = s.k === "later" ? s.inn : 0;
             if (wait > 45) continue;
-            if (s.k === "on" && s.left < 30) continue;
+            if (s.k === "on" && s.left < 20) continue;
             if (!openAt(arrive + wait)) continue;
             had = true;
-            const score = travel + wait * 1.5 + ((d.tags || []).includes("perk") ? 15 : 0);
-            if (!best || score < best.score) best = { b, o, oi, d, dist, travel, arrive, start: arrive + wait, score };
+            const perk = (d.tags || []).includes("perk") ? 8 : 0;
+            consider({ ...base, d, start: arrive + wait, score: h1.mins + 1.5 * wait + 1.5 * fromCentre + perk + pinBonus });
           }
-          if (!had && opts.fill && h && openAt(arrive) && openAt(arrive + Math.min(stay, 30))) {
-            const score = travel + 30;
-            if (!best || score < best.score) best = { b, o, oi, d: null, dist, travel, arrive, start: arrive, score };
+          if (!had && (opts.fill || isPinned) && openAt(arrive)) {
+            consider({ ...base, d: dealsFor(b, o)[0] || null, start: arrive, score: h1.mins + 1.5 * fromCentre + 15 + pinBonus });
           }
         });
       }
@@ -255,11 +279,11 @@
       return { b, o, oi: b.outlets.indexOf(o), d: ds[0] ? ds[0].d : (dealsFor(b, o)[0] || null), ws: ds[0] ? ds[0].s.s : 9999 };
     }).filter(Boolean).sort((a, b) => a.ws - b.ws);
     return picks.map((p) => {
-      const dist = km(pos, p.o.ll), travel = cabMin(dist), arrive = t + travel;
+      const dist = km(pos, p.o.ll), h1 = hop(dist), arrive = t + h1.mins;
       const s = p.d ? dealStatus(p.d, p.o, st.day, arrive) : null;
       const start = s && s.k === "later" ? arrive + s.inn : arrive;
       pos = p.o.ll; t = start + stay;
-      return { ...p, dist, travel, arrive, start };
+      return { ...p, dist, travel: h1.mins, walk: h1.walk, arrive, start };
     });
   }
 
@@ -283,7 +307,7 @@
       const closed = h && !h.some(([a, e]) => s.start >= a && s.start < e);
       const warn = closed ? "Closed by then" : s.d && !s.d.untimed && !s.d.allDay && (!ds || ds.k === "done") ? "Deal over by then" : "";
       return `<li class="stop">
-        <div class="hop">${ico("car")}${s.travel ? `${s.travel} min · ${kmLabel(s.dist)}` : "Start here"}</div>
+        <div class="hop">${ico(s.walk ? "walk" : "car")}${s.travel ? `${s.travel} min ${s.walk ? "walk" : "cab"} · ${kmLabel(s.dist)}` : i === 0 ? "Start here" : "Next door"}</div>
         <div class="when">${fmt(clock(s.start))}</div>
         <article class="card ${s.d ? "on" : ""}" data-n="${i + 1}">
           <div class="tile">${ico(drinkIcon(s.d))}</div>
@@ -301,7 +325,7 @@
   function showCrawl(auto) {
     const stay = +$("stay").value;
     if (auto) {
-      const stops = planCrawl(+$("stops").value, stay, { unconfirmed: $("incUnconf").checked, fill: $("fill").checked });
+      const stops = planCrawl(+$("stops").value, stay, { unconfirmed: $("incUnconf").checked, fill: $("fill").checked, radius: +$("radius").value, keep: st.crawl });
       st.crawl = stops.map((s) => ({ bar: s.b.id, outlet: s.oi }));
       store.set("crawlr.crawl", st.crawl);
       renderCrawl(stops, true);
@@ -334,6 +358,8 @@
     const isDeals = st.tab === "deals";
     $("tabDeals").setAttribute("aria-selected", isDeals); $("tabCrawl").setAttribute("aria-selected", !isDeals);
     $("deals").hidden = !isDeals; $("crawl").hidden = isDeals;
+    const pins = st.crawl.length;
+    $("planHint").textContent = `Starts in ${st.area} at ${fmt(clock(st.t))}, stays within ${$("radius").value} km${pins ? `, keeps your ${pins} pick${pins > 1 ? "s" : ""}` : ""}.`;
     if (isDeals) renderDeals(); else showCrawl(false);
     $("crawlCount").textContent = st.crawl.length || "";
   }
@@ -354,6 +380,7 @@
     $("tabCrawl").addEventListener("click", () => { st.tab = "crawl"; render(); });
     $("planBtn").addEventListener("click", () => showCrawl(true));
     $("stay").addEventListener("change", () => showCrawl(false));
+    $("radius").addEventListener("change", () => render());
     document.addEventListener("click", (e) => {
       const add = e.target.closest("[data-add]");
       if (add) {
@@ -372,7 +399,7 @@
   if (typeof module !== "undefined") {
     module.exports = { bd, clock, dealStatus, hoursOn,
       setup: (d, s) => { DATA = d; Object.assign(st, s); },
-      planCrawl: (n, stay, opts) => planCrawl(n, stay, opts), collect: () => collect() };
+      planCrawl: (n, stay, opts) => planCrawl(n, stay, Object.assign({ radius: 3 }, opts)), collect: () => collect() };
     return;
   }
   fetch("data/bars.json").then((r) => r.json()).then((d) => {
